@@ -1,14 +1,14 @@
 ﻿using Bogus;
 using Microsoft.EntityFrameworkCore;
-using Movies.API.Models.Entities;
+using Movies.Core.Models.Entities;
 using System.Globalization;
 
-namespace Movies.API.Data
+namespace Movies.Data
 {
     public class SeedData
     {
         private static Faker faker = new Faker();
-        internal static async Task InitAsync(MoviesApiContext context)
+        public static async Task InitAsync(MoviesApiContext context)
         {
             if (await context.Movie.AnyAsync()) return;
 

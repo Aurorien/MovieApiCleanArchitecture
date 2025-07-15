@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Movies.API.Data;
+using Movies.Data;
 using System.Diagnostics;
 
 namespace Movies.API.Extensions

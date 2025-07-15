@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Movies.API.Models.Entities;
+using Movies.Core.Models.Entities;
 
-namespace Movies.API.Data
+namespace Movies.Data
 {
     public class MoviesApiContext : DbContext
     {
@@ -11,8 +11,8 @@ namespace Movies.API.Data
         }
 
         public DbSet<Movie> Movie { get; set; } = default!;
-        public DbSet<Movies.API.Models.Entities.Actor> Actor { get; set; } = default!;
-        public DbSet<Movies.API.Models.Entities.Review> Review { get; set; } = default!;
+        public DbSet<Actor> Actor { get; set; } = default!;
+        public DbSet<Review> Review { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

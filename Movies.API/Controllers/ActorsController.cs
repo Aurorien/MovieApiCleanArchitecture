@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Movies.API.Data;
-using Movies.API.Models.DTOs.ActorDtos;
-using Movies.API.Models.DTOs.MovieDtos;
-using Movies.API.Models.Entities;
+using Movies.Core.Models.DTOs.ActorDtos;
+using Movies.Core.Models.DTOs.MovieDtos;
+using Movies.Core.Models.Entities;
+using Movies.Data;
 
 namespace Movies.API.Controllers
 {

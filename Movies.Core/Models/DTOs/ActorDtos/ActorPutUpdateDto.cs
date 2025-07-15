@@ -1,4 +1,4 @@
-﻿namespace Movies.API.Models.DTOs.ActorDtos
+﻿namespace Movies.Core.Models.DTOs.ActorDtos
 {
     public class ActorPutUpdateDto : ActorManipulationDto
     {

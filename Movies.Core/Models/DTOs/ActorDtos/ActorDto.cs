@@ -1,6 +1,6 @@
-﻿using Movies.API.Models.DTOs.MovieDtos;
+﻿using Movies.Core.Models.DTOs.MovieDtos;
 
-namespace Movies.API.Models.DTOs.ActorDtos
+namespace Movies.Core.Models.DTOs.ActorDtos
 {
     public class ActorDto
     {

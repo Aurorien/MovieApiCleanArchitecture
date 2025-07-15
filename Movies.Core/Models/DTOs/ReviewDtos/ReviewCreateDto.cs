@@ -1,4 +1,4 @@
-﻿namespace Movies.API.Models.DTOs.ReviewDtos
+﻿namespace Movies.Core.Models.DTOs.ReviewDtos
 {
     public class ReviewCreateDto : ReviewManipulationDto
     {

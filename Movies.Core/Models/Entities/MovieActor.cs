@@ -1,4 +1,4 @@
-﻿namespace Movies.API.Models.Entities
+﻿namespace Movies.Core.Models.Entities
 {
     public class MovieActor
     {

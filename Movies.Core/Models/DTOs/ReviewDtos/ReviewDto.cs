@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Movies.API.Models.DTOs.ReviewDtos
+namespace Movies.Core.Models.DTOs.ReviewDtos
 {
-    public class ReviewManipulationDto
+    public class ReviewDto
     {
+        public Guid Id { get; set; }
         [Required]
         public string ReviewerName { get; set; } = null!;
         [Required]

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Movies.API.Data;
 using Movies.API.Extensions;
+using Movies.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<MoviesApiContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MoviesApiContext") ?? throw new InvalidOperationException("Connection string 'MoviesApiContext' not found.")));

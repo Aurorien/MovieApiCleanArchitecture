@@ -1,16 +1,17 @@
-﻿using Movies.API.Models.DTOs.ActorDtos;
-using Movies.API.Models.DTOs.ReviewDtos;
+﻿using Movies.Core.Models.DTOs.ActorDtos;
+using Movies.Core.Models.DTOs.ReviewDtos;
 
-namespace Movies.API.Models.DTOs.MovieDtos
+namespace Movies.Core.Models.DTOs.MovieDtos
 {
-    public class MovieDto
+    public class MovieDetailedDto
     {
-        public Guid Id { get; set; }
         public string Title { get; set; } = null!;
         public int Year { get; set; }
         public string Genre { get; set; } = null!;
         public int DurationInMinutes { get; set; }
-        public string MovieDetailsLanguage { get; set; } = null!;
+        public string Synopsis { get; set; } = null!;
+        public string Language { get; set; } = null!;
+        public int Budget { get; set; }
         public IEnumerable<ActorDto> Actors { get; set; } = Enumerable.Empty<ActorDto>();
         public IEnumerable<ReviewDto> Reviews { get; set; } = Enumerable.Empty<ReviewDto>();
     }
