@@ -10,9 +10,9 @@ namespace Movies.API.Controllers
     [ApiController]
     public class ActorsController : ControllerBase
     {
-        private readonly MoviesApiContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public ActorsController(MoviesApiContext context)
+        public ActorsController(ApplicationDbContext context)
         {
             _context = context;
         }

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <DirectedGraph GraphDirection="LeftToRight" xmlns="http://schemas.microsoft.com/vs/2009/dgml">
   <Nodes>
-<Node Id="IModel" Label="MoviesApiContext" ChangeTrackingStrategy="ChangeTrackingStrategy.Snapshot" PropertyAccessMode="PropertyAccessMode.Default" ProductVersion="9.0.6" Annotations="BaseTypeDiscoveryConvention:DerivedTypes: System.Collections.Generic.Dictionary`2[System.Type,System.Collections.Generic.List`1[Microsoft.EntityFrameworkCore.Metadata.IConventionEntityType]]
+<Node Id="IModel" Label="ApplicationDbContext" ChangeTrackingStrategy="ChangeTrackingStrategy.Snapshot" PropertyAccessMode="PropertyAccessMode.Default" ProductVersion="9.0.6" Annotations="BaseTypeDiscoveryConvention:DerivedTypes: System.Collections.Generic.Dictionary`2[System.Type,System.Collections.Generic.List`1[Microsoft.EntityFrameworkCore.Metadata.IConventionEntityType]]
 InversePropertyAttributeConvention:InverseNavigations: System.Collections.Generic.Dictionary`2[System.Type,System.Collections.Generic.SortedSet`1[System.Type]]
 NonNullableConventionState: System.Reflection.NullabilityInfoContext
 Relational:MaxIdentifierLength: 128

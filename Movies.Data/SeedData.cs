@@ -8,8 +8,9 @@ namespace Movies.Data
     public class SeedData
     {
         private static Faker faker = new Faker();
-        public static async Task InitAsync(MoviesApiContext context)
+        public static async Task InitAsync(ApplicationDbContext context)
         {
+
             if (await context.Movie.AnyAsync()) return;
 
             var actors = GenerateActors(3);

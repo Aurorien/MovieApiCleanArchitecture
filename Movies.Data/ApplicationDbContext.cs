@@ -3,12 +3,9 @@ using Movies.Core.Models.Entities;
 
 namespace Movies.Data
 {
-    public class MoviesApiContext : DbContext
+    public class ApplicationDbContext : DbContext
     {
-        public MoviesApiContext(DbContextOptions<MoviesApiContext> options)
-            : base(options)
-        {
-        }
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         public DbSet<Movie> Movie { get; set; } = default!;
         public DbSet<Actor> Actor { get; set; } = default!;
