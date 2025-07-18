@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Movies.Core.DomainContracts;
+using System.Linq.Expressions;
 
 namespace Movies.Data.Repositories
 {
@@ -19,13 +20,29 @@ namespace Movies.Data.Repositories
 
         public void Create(T entity) => DbSet.Add(entity);
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+
+        public async Task<IEnumerable<T>> GetAllAsync(bool trackChanges = false, params Expression<Func<T, object>>[] includes)
         {
-            return await DbSet.ToListAsync();
+            var query = trackChanges ? DbSet : DbSet.AsNoTracking();
+
+            foreach (var include in includes)
+            {
+                if (include != null)
+                    query = query.Include(include);
+            }
+
+            return await query.ToListAsync();
         }
 
-        public async Task<T?> GetAsync(Guid id)
+        public async Task<T?> GetAsync(Guid id, bool trackChanges = false, params Expression<Func<T, object>>[] includes)
         {
+            var query = trackChanges ? DbSet : DbSet.AsNoTracking();
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
             return await DbSet.FirstOrDefaultAsync(e => EF.Property<Guid>(e, "Id") == id);
         }
 

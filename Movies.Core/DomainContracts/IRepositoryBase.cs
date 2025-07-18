@@ -1,9 +1,11 @@
-﻿namespace Movies.Core.DomainContracts
+﻿using System.Linq.Expressions;
+
+namespace Movies.Core.DomainContracts
 {
     public interface IRepositoryBase<T>
     {
-        Task<IEnumerable<T>> GetAllAsync();
-        Task<T?> GetAsync(Guid id);
+        Task<IEnumerable<T>> GetAllAsync(bool trackChanges = false, params Expression<Func<T, object>>[] includes);
+        Task<T?> GetAsync(Guid id, bool trackChanges = false, params Expression<Func<T, object>>[] includes);
         Task<bool> AnyAsync(Guid id);
         void Create(T entity);
         void Update(T entity);

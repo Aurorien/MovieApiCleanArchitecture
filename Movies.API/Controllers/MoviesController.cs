@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Movies.Core.DomainContracts;
 using Movies.Core.Models.DTOs.ActorDtos;
 using Movies.Core.Models.DTOs.MovieDtos;
 using Movies.Core.Models.DTOs.ReviewDtos;
 using Movies.Core.Models.Entities;
-using Movies.Data;
 
 namespace Movies.API.Controllers
 {
@@ -12,11 +12,11 @@ namespace Movies.API.Controllers
     [ApiController]
     public class MoviesController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IUnitOfWork _uow;
 
-        public MoviesController(ApplicationDbContext context)
+        public MoviesController(IUnitOfWork uow)
         {
-            _context = context;
+            _uow = uow;
         }
 
 
@@ -25,17 +25,20 @@ namespace Movies.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<MovieDto>>> GetMovies()
         {
-            var movieDtos = await _context.Movie
-                .Select(m => new MovieDto
-                {
-                    Id = m.Id,
-                    Title = m.Title,
-                    Year = m.Year,
-                    Genre = m.Genre,
-                    DurationInMinutes = m.DurationInMinutes,
-                    MovieDetailsLanguage = m.MovieDetails.Language
-                })
-                .ToListAsync();
+            var movies = await _uow.Movies.GetAllAsync(
+                false,
+                m => m.MovieDetails);
+
+            var movieDtos = movies.Select(m => new MovieDto
+            {
+                Id = m.Id,
+                Title = m.Title,
+                Year = m.Year,
+                Genre = m.Genre,
+                DurationInMinutes = m.DurationInMinutes,
+                MovieDetailsLanguage = m.MovieDetails.Language
+            })
+            .ToList();
 
             return Ok(movieDtos);
         }
@@ -47,23 +50,22 @@ namespace Movies.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<MovieDto>> GetMovie([FromRoute] Guid id)
         {
-            var movieDto = await _context.Movie
-                .Where(m => m.Id == id)
-                .Select(m => new MovieDto
-                {
-                    Id = m.Id,
-                    Title = m.Title,
-                    Year = m.Year,
-                    Genre = m.Genre,
-                    DurationInMinutes = m.DurationInMinutes,
-                    MovieDetailsLanguage = m.MovieDetails.Language
-                })
-                .FirstOrDefaultAsync();
+            var movie = await _uow.Movies.GetAsync(id);
 
-            if (movieDto == null)
+            if (movie == null)
             {
                 return NotFound();
             }
+
+            var movieDto = new MovieDto
+            {
+                Id = movie.Id,
+                Title = movie.Title,
+                Year = movie.Year,
+                Genre = movie.Genre,
+                DurationInMinutes = movie.DurationInMinutes,
+                MovieDetailsLanguage = movie.MovieDetails.Language
+            };
 
             return Ok(movieDto);
         }
@@ -75,42 +77,45 @@ namespace Movies.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<MovieDetailedDto>> GetMovieDetailed([FromRoute] Guid id)
         {
-            var movieDetailed = await _context.Movie
-                .Where(m => m.Id == id)
-                .Include(m => m.MovieDetails)
-                .Select(m => new MovieDetailedDto
+            var movie = await _uow.Movies.GetAsync(
+                id,
+                trackChanges: false,
+                m => m.MovieDetails,
+                m => m.MovieActors.Select(ma => ma.Actor.MovieActors.Select(am => am.Movie)),
+                m => m.Reviews
+                );
+            if (movie == null)
+                return NotFound();
+
+            var movieDetailed = new MovieDetailedDto
+            {
+                Title = movie.Title,
+                Year = movie.Year,
+                Genre = movie.Genre,
+                DurationInMinutes = movie.DurationInMinutes,
+                Synopsis = movie.MovieDetails.Synopsis,
+                Language = movie.MovieDetails.Language,
+                Budget = movie.MovieDetails.Budget,
+                Actors = movie.MovieActors.Select(ma => new ActorDto
                 {
-                    Title = m.Title,
-                    Year = m.Year,
-                    Genre = m.Genre,
-                    DurationInMinutes = m.DurationInMinutes,
-                    Synopsis = m.MovieDetails.Synopsis,
-                    Language = m.MovieDetails.Language,
-                    Budget = m.MovieDetails.Budget,
-                    Actors = m.MovieActors.Select(ma => new ActorDto
+                    Id = ma.Actor.Id,
+                    FullName = ma.Actor.FullName,
+                    BirthYear = ma.Actor.BirthYear,
+                    MovieTitles = ma.Actor.MovieActors.Select(am => new MovieTitlesDto
                     {
-                        Id = ma.Actor.Id,
-                        FullName = ma.Actor.FullName,
-                        BirthYear = ma.Actor.BirthYear,
-                        MovieTitles = ma.Actor.MovieActors.Select(ma => new MovieTitlesDto
-                        {
-                            Id = ma.Movie.Id,
-                            Title = ma.Movie.Title,
-                            Role = ma.Role
-                        }),
-                    }),
-                    Reviews = m.Reviews.Select(r => new ReviewDto
-                    {
-                        Id = r.Id,
-                        ReviewerName = r.ReviewerName,
-                        Comment = r.Comment,
-                        Rating = r.Rating
+                        Id = am.Movie.Id,
+                        Title = am.Movie.Title,
+                        Role = am.Role
                     })
+                }),
+                Reviews = movie.Reviews.Select(r => new ReviewDto
+                {
+                    Id = r.Id,
+                    ReviewerName = r.ReviewerName,
+                    Comment = r.Comment,
+                    Rating = r.Rating
                 })
-                .FirstOrDefaultAsync();
-
-
-            if (movieDetailed is null) return NotFound();
+            };
 
             return Ok(movieDetailed);
         }
@@ -141,8 +146,8 @@ namespace Movies.API.Controllers
 
             };
 
-            _context.Movie.Add(movie);
-            await _context.SaveChangesAsync();
+            _uow.Movies.Create(movie);
+            await _uow.CompleteAsync();
 
             var movieDto = new MovieDto
             {
@@ -169,11 +174,13 @@ namespace Movies.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var movie = await _context.Movie
-                   .Include(m => m.MovieDetails)
-                   .Include(m => m.MovieActors)
-                        .ThenInclude(ma => ma.Actor)
-                   .FirstOrDefaultAsync(m => m.Id == id);
+            var movie = await _uow.Movies.GetAsync(
+                id,
+                trackChanges: false,
+                m => m.MovieDetails,
+                m => m.MovieActors.Select(ma => ma.Actor.MovieActors.Select(am => am.Movie)),
+                m => m.Reviews
+                );
 
             if (movie is null) return NotFound();
 
@@ -187,11 +194,11 @@ namespace Movies.API.Controllers
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _uow.CompleteAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!MovieExists(id))
+                if (!await MovieExistsAsync(id))
                 {
                     return NotFound();
                 }
@@ -211,21 +218,21 @@ namespace Movies.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteMovie([FromRoute] Guid id)
         {
-            var movie = await _context.Movie.FindAsync(id);
+            var movie = await _uow.Movies.GetAsync(id);
             if (movie == null)
             {
                 return NotFound();
             }
 
-            _context.Movie.Remove(movie);
-            await _context.SaveChangesAsync();
+            _uow.Movies.Delete(movie);
+            await _uow.CompleteAsync();
 
             return NoContent();
         }
 
-        private bool MovieExists(Guid id)
+        private async Task<bool> MovieExistsAsync(Guid id)
         {
-            return _context.Movie.Any(e => e.Id == id);
+            return await _uow.Movies.AnyAsync(id);
         }
     }
 }
