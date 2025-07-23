@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Movies.API.Extensions;
-using Movies.Core.DomainContracts;
+using Movies.Contracts;
+using Movies.Core.Domain.Contracts;
 using Movies.Data;
 using Movies.Data.Repositories;
+using Movies.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -11,6 +13,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IServiceManager, ServiceManager>();
 //AddScoped is good to use here, because that will create one instance that is used throughout the http request,
 // To compare, Singleton would not be good because it creates an instance that is used for the entire application lifetime
 //which leads to shared state between all users and safety issues with concurrent requests,

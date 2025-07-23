@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Movies.Core.Models.DTOs.ActorDtos;
-using Movies.Core.Models.DTOs.MovieDtos;
-using Movies.Core.Models.Entities;
+using Movies.Core.Domain.Models.DTOs.ActorDtos;
+using Movies.Core.Domain.Models.DTOs.MovieDtos;
+using Movies.Core.Domain.Models.Entities;
 using Movies.Data;
 
 namespace Movies.API.Controllers

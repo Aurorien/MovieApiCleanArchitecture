@@ -1,9 +1,9 @@
-﻿using Movies.Core.DomainContracts;
-using Movies.Core.Models.Entities;
+﻿using Movies.Core.Domain.Contracts;
+using Movies.Core.Domain.Models.Entities;
 
 namespace Movies.Data.Repositories
 {
-    public class ActorRepository : RepositoryBase<Actor>, IActorRepository
+    public class ActorRepository : BaseRepository<Actor>, IActorRepository
     {
         public ActorRepository(ApplicationDbContext context) : base(context) { }
     }
