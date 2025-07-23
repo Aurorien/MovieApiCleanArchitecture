@@ -12,8 +12,17 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 builder.Services.AddScoped<IServiceManager, ServiceManager>();
+builder.Services.AddScoped<IMovieService, MovieService>();
+builder.Services.AddScoped<IActorService, ActorService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped(provider => new Lazy<IMovieService>(() => provider.GetRequiredService<IMovieService>()));
+builder.Services.AddScoped(provider => new Lazy<IActorService>(() => provider.GetRequiredService<IActorService>()));
+builder.Services.AddScoped(provider => new Lazy<IReviewService>(() => provider.GetRequiredService<IReviewService>()));
+
 //AddScoped is good to use here, because that will create one instance that is used throughout the http request,
 // To compare, Singleton would not be good because it creates an instance that is used for the entire application lifetime
 //which leads to shared state between all users and safety issues with concurrent requests,
