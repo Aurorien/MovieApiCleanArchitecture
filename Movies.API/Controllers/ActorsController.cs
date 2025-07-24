@@ -37,13 +37,14 @@ namespace Movies.API.Controllers
         // GET: api/actors/5
         [HttpGet("api/actors/{id:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Actor>> GetActor([FromRoute] Guid id)
         {
             if (id == Guid.Empty)
                 return BadRequest(new { message = "Invalid actor ID" });
 
-            var actorDto = await serviceManager.ActorService.GetAsync(id, trackChanges: false);
+            var actorDto = await serviceManager.ActorService.GetAsync(id);
 
             if (actorDto == null)
             {

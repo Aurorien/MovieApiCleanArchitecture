@@ -17,22 +17,23 @@ namespace Movies.Services
         }
 
         public async Task<bool> AnyAsync(Guid id) => await uow.Actors.AnyAsync(id);
-        public async Task<IEnumerable<ActorDto>> GetAllAsync(bool trackChanges = false)
+
+        public async Task<IEnumerable<ActorDto>> GetAllAsync()
         {
-            var actors = await uow.Actors.GetAllAsync(trackChanges,
-                a => a.MovieActors,
-                a => a.MovieActors.Select(ma => ma.Movie)
-                );
+            var actors = await uow.Actors.GetAllAsync(trackChanges: false,
+                                                       a => a.MovieActors,
+                                                       a => a.MovieActors.Select(ma => ma.Movie)
+                                                      );
 
             return actors.Select(MapToDto);
         }
 
-        public async Task<ActorDto?> GetAsync(Guid id, bool trackChanges = false)
+        public async Task<ActorDto?> GetAsync(Guid id)
         {
-            var actor = await uow.Actors.GetAsync(id, trackChanges,
-                a => a.MovieActors,
-                a => a.MovieActors.Select(ma => ma.Movie)
-                );
+            var actor = await uow.Actors.GetAsync(id, trackChanges: false,
+                                                   a => a.MovieActors,
+                                                   a => a.MovieActors.Select(ma => ma.Movie)
+                                                  );
 
             return actor != null ? MapToDto(actor) : null;
         }
