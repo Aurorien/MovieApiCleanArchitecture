@@ -2,5 +2,8 @@
 
 namespace Movies.Contracts
 {
-    public interface IMovieService : IBaseService<MovieDto, MovieCreateDto, MoviePutUpdateDto> { }
+    public interface IMovieService : IBaseService<MovieDto, MovieCreateDto, MoviePutUpdateDto>
+    {
+        Task<MovieDetailedDto?> GetDetailedAsync(Guid id, bool trackChanges = false);
+    }
 }
