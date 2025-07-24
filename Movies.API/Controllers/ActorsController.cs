@@ -1,69 +1,49 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Movies.Contracts;
 using Movies.Core.Domain.Models.DTOs.ActorDtos;
-using Movies.Core.Domain.Models.DTOs.MovieDtos;
 using Movies.Core.Domain.Models.Entities;
-using Movies.Data;
 
 namespace Movies.API.Controllers
 {
     [ApiController]
     public class ActorsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IServiceManager serviceManager;
+        const int maxPageSize = 30;
 
-        public ActorsController(ApplicationDbContext context)
+        public ActorsController(IServiceManager serviceManager)
         {
-            _context = context;
+            this.serviceManager = serviceManager;
         }
 
 
         // GET: api/actors
         [HttpGet("api/actors")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<ActorDto>>> GetActor()
+        public async Task<ActionResult<IEnumerable<ActorDto>>> GetActor(int pageNumber = 1, int pageSize = 20)
         {
-            var actorDtos = await _context.Actor
-                .Select(a => new ActorDto
-                {
-                    Id = a.Id,
-                    FullName = a.FullName,
-                    BirthYear = a.BirthYear,
-                    MovieTitles = a.MovieActors.Select(ma => new MovieTitlesDto
-                    {
-                        Id = ma.Movie.Id,
-                        Title = ma.Movie.Title,
-                        Role = ma.Role
-                    }),
-                })
-                .ToListAsync();
+            if (pageSize > maxPageSize)
+            {
+                pageSize = maxPageSize;
+            }
 
+            var actorDtos = await serviceManager.ActorService.GetAllAsync();
 
             return Ok(actorDtos);
         }
 
 
         // GET: api/actors/5
-        [HttpGet("api/actors{id:guid}")]
+        [HttpGet("api/actors/{id:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Actor>> GetActor([FromRoute] Guid id)
         {
-            var actorDto = await _context.Actor
-                .Where(a => a.Id == id)
-                .Select(a => new ActorDto
-                {
-                    Id = a.Id,
-                    FullName = a.FullName,
-                    BirthYear = a.BirthYear,
-                    MovieTitles = a.MovieActors.Select(ma => new MovieTitlesDto
-                    {
-                        Id = ma.Movie.Id,
-                        Title = ma.Movie.Title,
-                        Role = ma.Role
-                    }),
-                })
-                .FirstOrDefaultAsync();
+            if (id == Guid.Empty)
+                return BadRequest(new { message = "Invalid actor ID" });
+
+            var actorDto = await serviceManager.ActorService.GetAsync(id, trackChanges: false);
 
             if (actorDto == null)
             {
@@ -84,28 +64,7 @@ namespace Movies.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var actor = new Actor
-            {
-                FirstName = createActorDto.FirstName,
-                LastName = createActorDto.LastName,
-                BirthYear = createActorDto.BirthYear,
-            };
-
-            _context.Actor.Add(actor);
-            await _context.SaveChangesAsync();
-
-            var actorDto = new ActorDto
-            {
-                Id = actor.Id,
-                FullName = actor.FullName,
-                BirthYear = actor.BirthYear,
-                MovieTitles = actor.MovieActors.Select(ma => new MovieTitlesDto
-                {
-                    Id = ma.Movie.Id,
-                    Title = ma.Movie.Title,
-                    Role = ma.Role
-                }),
-            };
+            var actorDto = await serviceManager.ActorService.CreateAsync(createActorDto);
 
             return CreatedAtAction("GetActor", new { id = actorDto.Id }, actorDto);
         }
@@ -117,72 +76,69 @@ namespace Movies.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PostActorToMovie([FromRoute] Guid movieId, [FromBody] MovieActorCreateDto maCreateDto)
         {
+            if (movieId == Guid.Empty)
+                return BadRequest(new { message = "Invalid movie ID" });
 
-            var movie = await _context.Movie.FirstOrDefaultAsync(m => m.Id == movieId);
-            if (movie == null) return NotFound("Movie not found");
-
-            var actor = await _context.Actor.FirstOrDefaultAsync(m => m.Id == maCreateDto.ActorId);
-            if (actor == null) return NotFound("Actor not found");
-
-            var isActorAlreadyInMovie = await _context.Set<MovieActor>()
-                                                      .AnyAsync(ma => ma.MovieId == movieId && ma.ActorId == maCreateDto.ActorId);
-
-            if (isActorAlreadyInMovie)
-                return BadRequest("Actor is already assigned to this movie");
-
-            var movieActor = new MovieActor
+            try
             {
-                MovieId = movieId,
-                ActorId = maCreateDto.ActorId,
-                Role = maCreateDto.Role
-            };
+                var movieExists = await serviceManager.MovieService.AnyAsync(movieId);
+                if (!movieExists)
+                    return NotFound("Movie not found");
 
-            _context.Set<MovieActor>().Add(movieActor);
-            await _context.SaveChangesAsync();
+                var actorExists = await serviceManager.ActorService.AnyAsync(maCreateDto.ActorId);
+                if (!actorExists)
+                    return NotFound("Actor not found");
 
-            return NoContent();
+                var success = await serviceManager.ActorService.AddActorToMovieAsync(movieId, maCreateDto.ActorId, maCreateDto.Role);
+
+                if (!success)
+                    return BadRequest("Actor is already assigned to this movie");
+
+                return NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"An internal server error occurred. \n {ex}" });
+            }
         }
-
 
 
         // PUT: api/actors/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("api/actors{id}")]
+        [HttpPut("api/actors/{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PutActor([FromRoute] Guid id, [FromBody] ActorPutUpdateDto updateActorDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
-            var actor = await _context.Actor.FirstOrDefaultAsync(a => a.Id == id);
-
-            if (actor is null) return NotFound();
-
-            actor.FirstName = updateActorDto.FirstName;
-            actor.LastName = updateActorDto.LastName;
-            actor.BirthYear = updateActorDto.BirthYear;
+            else if (id == Guid.Empty)
+                return BadRequest(new { message = "Invalid actor ID" });
 
             try
             {
-                await _context.SaveChangesAsync();
+                var success = await serviceManager.ActorService.UpdateAsync(id, updateActorDto);
+                return success ? NoContent() : NotFound();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ActorExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return Conflict(new { message = "The record was modified by another process" });
             }
-
-            return NoContent();
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { message = "An error occurred while updating the actor" });
+            }
         }
 
         // DELETE: api/actors/5
@@ -207,7 +163,7 @@ namespace Movies.API.Controllers
                 return Conflict(new { message = "The record was modified by another process" });
             }
             catch (Exception)
-        {
+            {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     new { message = "An error occurred while deleting the actor" });
             }
