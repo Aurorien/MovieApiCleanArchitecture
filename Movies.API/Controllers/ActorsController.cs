@@ -185,10 +185,32 @@ namespace Movies.API.Controllers
             return NoContent();
         }
 
-
-        private bool ActorExists(Guid id)
+        // DELETE: api/actors/5
+        [HttpDelete("api/actors/{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DeleteActor([FromRoute] Guid id)
         {
-            return _context.Actor.Any(e => e.Id == id);
+            if (id == Guid.Empty)
+                return BadRequest(new { message = "Invalid actor ID" });
+
+            try
+            {
+                var success = await serviceManager.ActorService.DeleteAsync(id);
+                return success ? NoContent() : NotFound();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return Conflict(new { message = "The record was modified by another process" });
+            }
+            catch (Exception)
+        {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { message = "An error occurred while deleting the actor" });
+            }
         }
     }
 }

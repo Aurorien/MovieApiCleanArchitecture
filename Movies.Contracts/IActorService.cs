@@ -1,6 +1,6 @@
-﻿using Movies.Core.Domain.Models.Entities;
+﻿using Movies.Core.Domain.Models.DTOs.ActorDtos;
 
 namespace Movies.Contracts
 {
-    public interface IActorService : IBaseService<Actor> { }
+    public interface IActorService : IBaseService<ActorDto, ActorCreateDto, ActorPutUpdateDto> { }
 }

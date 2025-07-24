@@ -1,6 +1,6 @@
-﻿using Movies.Core.Domain.Models.Entities;
+﻿using Movies.Core.Domain.Models.DTOs.ReviewDtos;
 
 namespace Movies.Contracts
 {
-    public interface IReviewService : IBaseService<Review> { }
+    public interface IReviewService : IBaseService<ReviewDto, ReviewCreateDto, ReviewPutUpdateDto> { }
 }
