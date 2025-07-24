@@ -16,6 +16,18 @@ namespace Movies.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<MovieActor>().HasKey(ma => new { ma.MovieId, ma.ActorId });
+
+            modelBuilder.Entity<MovieActor>()
+                .HasOne(ma => ma.Actor)
+                .WithMany(a => a.MovieActors)
+                .HasForeignKey(ma => ma.ActorId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<MovieActor>()
+                .HasOne(ma => ma.Movie)
+                .WithMany(m => m.MovieActors)
+                .HasForeignKey(ma => ma.MovieId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
