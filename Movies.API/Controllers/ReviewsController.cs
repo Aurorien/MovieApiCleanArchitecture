@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Movies.Contracts;
 using Movies.Core.Domain.Models.DTOs.ReviewDtos;
-using Movies.Core.Domain.Models.Entities;
-using Movies.Data;
 
 namespace Movies.API.Controllers
 {
@@ -10,30 +9,19 @@ namespace Movies.API.Controllers
     [ApiController]
     public class ReviewsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IServiceManager serviceManager;
 
-        public ReviewsController(ApplicationDbContext context)
+        public ReviewsController(IServiceManager serviceManager)
         {
-            _context = context;
+            this.serviceManager = serviceManager;
         }
-
 
         // GET: api/Reviews
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<ReviewDto>>> GetReviews()
         {
-
-            var reviewDtos = await _context.Review
-                .Select(r => new ReviewDto
-                {
-                    Id = r.Id,
-                    ReviewerName = r.ReviewerName,
-                    Comment = r.Comment,
-                    Rating = r.Rating
-                })
-                .ToListAsync();
-
+            var reviewDtos = await serviceManager.ReviewService.GetAllAsync();
 
             return Ok(reviewDtos);
         }
@@ -42,20 +30,14 @@ namespace Movies.API.Controllers
         // GET: api/Reviews/5
         [HttpGet("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ReviewDto>> GetReview([FromRoute] Guid id)
         {
-            var reviewDto = await _context.Review
-                .Where(r => r.Id == id)
-                .Select(r => new ReviewDto
-                {
-                    Id = r.Id,
-                    ReviewerName = r.ReviewerName,
-                    Comment = r.Comment,
-                    Rating = r.Rating
-                })
-                .FirstOrDefaultAsync();
+            if (id == Guid.Empty)
+                return BadRequest(new { message = "Invalid review ID" });
 
+            var reviewDto = await serviceManager.ReviewService.GetAsync(id);
 
             if (reviewDto == null)
             {
@@ -71,28 +53,12 @@ namespace Movies.API.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ReviewDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<ReviewDto>> PostReview([FromBody] ReviewCreateDto createReviewDto)
+        public async Task<ActionResult<ReviewDto>> PostReview([FromBody] ReviewCreateDto createDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var review = new Review
-            {
-                ReviewerName = createReviewDto.ReviewerName,
-                Comment = createReviewDto.Comment,
-                Rating = createReviewDto.Rating
-            };
-
-            _context.Review.Add(review);
-            await _context.SaveChangesAsync();
-
-            var reviewDto = new ReviewDto
-            {
-                Id = review.Id,
-                ReviewerName = review.ReviewerName,
-                Comment = review.Comment,
-                Rating = review.Rating
-            };
+            var reviewDto = await serviceManager.ReviewService.CreateAsync(createDto);
 
             return CreatedAtAction("GetReview", new { id = reviewDto.Id }, reviewDto);
         }
@@ -104,61 +70,58 @@ namespace Movies.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> PutReview([FromRoute] Guid id, [FromBody] ReviewPutUpdateDto updateReviewDto)
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> PutReview([FromRoute] Guid id, [FromBody] ReviewPutUpdateDto updateDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
-            var review = await _context.Review.FirstOrDefaultAsync(r => r.Id == id);
-
-            if (review is null) return NotFound();
-
-            review.ReviewerName = updateReviewDto.ReviewerName;
-            review.Comment = updateReviewDto.Comment;
-            review.Rating = updateReviewDto.Rating;
-
+            else if (id == Guid.Empty)
+                return BadRequest(new { message = "Invalid review ID" });
 
             try
             {
-                await _context.SaveChangesAsync();
+                var success = await serviceManager.ReviewService.UpdateAsync(id, updateDto);
+                return success ? NoContent() : NotFound();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ReviewExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return Conflict(new { message = "The record was modified by another process" });
             }
-
-            return NoContent();
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { message = "An error occurred while updating the review" });
+            }
         }
 
 
         // DELETE: api/Reviews/5
         [HttpDelete("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteReview([FromRoute] Guid id)
         {
-            var review = await _context.Review.FindAsync(id);
-            if (review == null)
+            if (id == Guid.Empty)
+                return BadRequest(new { message = "Invalid review ID" });
+
+            try
             {
-                return NotFound();
+                var success = await serviceManager.ReviewService.DeleteAsync(id);
+                return success ? NoContent() : NotFound();
             }
-
-            _context.Review.Remove(review);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool ReviewExists(Guid id)
-        {
-            return _context.Review.Any(e => e.Id == id);
+            catch (DbUpdateConcurrencyException)
+            {
+                return Conflict(new { message = "The record was modified by another process" });
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { message = "An error occurred while deleting the review" });
+            }
         }
     }
 }
