@@ -72,12 +72,12 @@ namespace Movies.API.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(MovieDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<MovieDto>> PostMovie([FromBody] MovieCreateDto createMovieDto)
+        public async Task<ActionResult<MovieDto>> PostMovie([FromBody] MovieCreateDto createDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var movieDto = await serviceManager.MovieService.CreateAsync(createMovieDto);
+            var movieDto = await serviceManager.MovieService.CreateAsync(createDto);
 
             return CreatedAtAction("GetMovie", new { id = movieDto.Id }, movieDto);
         }
@@ -91,7 +91,7 @@ namespace Movies.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> PutMovie([FromRoute] Guid id, [FromBody] MoviePutUpdateDto updateMovieDto)
+        public async Task<IActionResult> PutMovie([FromRoute] Guid id, [FromBody] MoviePutUpdateDto updateDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -100,7 +100,7 @@ namespace Movies.API.Controllers
 
             try
             {
-                var success = await serviceManager.MovieService.UpdateAsync(id, updateMovieDto);
+                var success = await serviceManager.MovieService.UpdateAsync(id, updateDto);
                 return success ? NoContent() : NotFound();
             }
             catch (DbUpdateConcurrencyException)

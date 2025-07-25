@@ -21,7 +21,7 @@ namespace Movies.API.Controllers
         // GET: api/actors
         [HttpGet("api/actors")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<ActorDto>>> GetActor(int pageNumber = 1, int pageSize = 20)
+        public async Task<ActionResult<IEnumerable<ActorDto>>> GetActors(int pageNumber = 1, int pageSize = 20)
         {
             if (pageSize > maxPageSize)
             {
@@ -60,12 +60,12 @@ namespace Movies.API.Controllers
         [HttpPost("api/actors")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ActorDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<ActorDto>> PostActor([FromBody] ActorCreateDto createActorDto)
+        public async Task<ActionResult<ActorDto>> PostActor([FromBody] ActorCreateDto createDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var actorDto = await serviceManager.ActorService.CreateAsync(createActorDto);
+            var actorDto = await serviceManager.ActorService.CreateAsync(createDto);
 
             return CreatedAtAction("GetActor", new { id = actorDto.Id }, actorDto);
         }
@@ -119,7 +119,7 @@ namespace Movies.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> PutActor([FromRoute] Guid id, [FromBody] ActorPutUpdateDto updateActorDto)
+        public async Task<IActionResult> PutActor([FromRoute] Guid id, [FromBody] ActorPutUpdateDto updateDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -128,7 +128,7 @@ namespace Movies.API.Controllers
 
             try
             {
-                var success = await serviceManager.ActorService.UpdateAsync(id, updateActorDto);
+                var success = await serviceManager.ActorService.UpdateAsync(id, updateDto);
                 return success ? NoContent() : NotFound();
             }
             catch (DbUpdateConcurrencyException)

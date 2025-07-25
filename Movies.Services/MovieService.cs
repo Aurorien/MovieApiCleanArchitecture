@@ -49,19 +49,19 @@ namespace Movies.Services
             return movie != null ? MapToDetailedDto(movie) : null;
         }
 
-        public async Task<MovieDto> CreateAsync(MovieCreateDto createMovieDto)
+        public async Task<MovieDto> CreateAsync(MovieCreateDto createDto)
         {
             var movie = new Movie
             {
-                Title = createMovieDto.Title,
-                Year = createMovieDto.Year,
-                Genre = createMovieDto.Genre,
-                DurationInMinutes = createMovieDto.DurationInMinutes,
+                Title = createDto.Title,
+                Year = createDto.Year,
+                Genre = createDto.Genre,
+                DurationInMinutes = createDto.DurationInMinutes,
                 MovieDetails = new MovieDetails
                 {
-                    Synopsis = createMovieDto.Synopsis,
-                    Language = createMovieDto.Language,
-                    Budget = createMovieDto.Budget
+                    Synopsis = createDto.Synopsis,
+                    Language = createDto.Language,
+                    Budget = createDto.Budget
                 }
 
             };
@@ -72,7 +72,7 @@ namespace Movies.Services
             return MapToDto(movie);
         }
 
-        public async Task<bool> UpdateAsync(Guid id, MoviePutUpdateDto updateMovieDto)
+        public async Task<bool> UpdateAsync(Guid id, MoviePutUpdateDto updateDto)
         {
             var movie = await uow.Movies.GetAsync(id, trackChanges: true);
             if (movie == null)
@@ -80,13 +80,13 @@ namespace Movies.Services
                 return false;
             }
 
-            movie.Title = updateMovieDto.Title;
-            movie.Year = updateMovieDto.Year;
-            movie.Genre = updateMovieDto.Genre;
-            movie.DurationInMinutes = updateMovieDto.DurationInMinutes;
-            movie.MovieDetails.Synopsis = updateMovieDto.Synopsis;
-            movie.MovieDetails.Language = updateMovieDto.Language;
-            movie.MovieDetails.Budget = updateMovieDto.Budget;
+            movie.Title = updateDto.Title;
+            movie.Year = updateDto.Year;
+            movie.Genre = updateDto.Genre;
+            movie.DurationInMinutes = updateDto.DurationInMinutes;
+            movie.MovieDetails.Synopsis = updateDto.Synopsis;
+            movie.MovieDetails.Language = updateDto.Language;
+            movie.MovieDetails.Budget = updateDto.Budget;
 
             try
             {
@@ -96,7 +96,7 @@ namespace Movies.Services
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await uow.Actors.AnyAsync(id))
+                if (!await uow.Movies.AnyAsync(id))
                     return false;
 
                 throw;
