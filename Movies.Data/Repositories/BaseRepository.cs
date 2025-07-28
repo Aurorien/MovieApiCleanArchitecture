@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Movies.Core.Domain.Contracts;
+using Movies.Core.Requests;
 using System.Linq.Expressions;
 
 namespace Movies.Data.Repositories
@@ -18,7 +19,7 @@ namespace Movies.Data.Repositories
             return await DbSet.AnyAsync(e => EF.Property<Guid>(e, "Id") == id);
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync(bool trackChanges = false, params Expression<Func<T, object>>[] includes)
+        public async Task<(IEnumerable<T>, PaginationMetadata)> GetAllAsync(bool trackChanges, BaseRequestParams requestParams, params Expression<Func<T, object>>[] includes)
         {
             var query = trackChanges ? DbSet : DbSet.AsNoTracking();
 
@@ -28,10 +29,20 @@ namespace Movies.Data.Repositories
                     query = query.Include(include);
             }
 
-            return await query.ToListAsync();
+            var totalItemCount = await query.CountAsync();
+
+            var paginationMetadata = new PaginationMetadata(totalItemCount, requestParams.PageSize, requestParams.Page);
+
+            query = query.OrderBy(e => EF.Property<Guid>(e, "Id"))
+                         .Skip(requestParams.PageSize * (requestParams.Page - 1))
+                         .Take(requestParams.PageSize);
+
+            var collectionToReturn = await query.ToListAsync();
+
+            return (collectionToReturn, paginationMetadata);
         }
 
-        public async Task<T?> GetAsync(Guid id, bool trackChanges = false, params Expression<Func<T, object>>[] includes)
+        public async Task<T?> GetAsync(Guid id, bool trackChanges, params Expression<Func<T, object>>[] includes)
         {
             var query = trackChanges ? DbSet : DbSet.AsNoTracking();
 

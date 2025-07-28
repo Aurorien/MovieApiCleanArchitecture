@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Movies.Contracts;
 using Movies.Core.Domain.Models.DTOs.ActorDtos;
 using Movies.Core.Domain.Models.Entities;
+using Movies.Core.Requests;
+using System.Text.Json;
 
 namespace Movies.API.Controllers
 {
@@ -10,7 +12,7 @@ namespace Movies.API.Controllers
     public class ActorsController : ControllerBase
     {
         private readonly IServiceManager serviceManager;
-        const int maxPageSize = 30;
+        const int maxPageSize = 100;
 
         public ActorsController(IServiceManager serviceManager)
         {
@@ -21,14 +23,11 @@ namespace Movies.API.Controllers
         // GET: api/actors
         [HttpGet("api/actors")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<ActorDto>>> GetActors(int pageNumber = 1, int pageSize = 20)
+        public async Task<ActionResult<IEnumerable<ActorDto>>> GetActors([FromQuery] BaseRequestParams requestParams)
         {
-            if (pageSize > maxPageSize)
-            {
-                pageSize = maxPageSize;
-            }
+            var (actorDtos, paginationMetadata) = await serviceManager.ActorService.GetAllAsync(requestParams);
 
-            var actorDtos = await serviceManager.ActorService.GetAllAsync();
+            Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
 
             return Ok(actorDtos);
         }

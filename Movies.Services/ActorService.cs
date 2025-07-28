@@ -4,6 +4,7 @@ using Movies.Core.Domain.Contracts;
 using Movies.Core.Domain.Models.DTOs.ActorDtos;
 using Movies.Core.Domain.Models.DTOs.MovieDtos;
 using Movies.Core.Domain.Models.Entities;
+using Movies.Core.Requests;
 
 namespace Movies.Services
 {
@@ -18,14 +19,15 @@ namespace Movies.Services
 
         public async Task<bool> AnyAsync(Guid id) => await uow.Actors.AnyAsync(id);
 
-        public async Task<IEnumerable<ActorDto>> GetAllAsync()
+        public async Task<(IEnumerable<ActorDto>, PaginationMetadata)> GetAllAsync(BaseRequestParams requestParams)
         {
-            var actors = await uow.Actors.GetAllAsync(trackChanges: false,
+            var (actors, paginationMetadata) = await uow.Actors.GetAllAsync(trackChanges: false,
+                                                       requestParams,
                                                        a => a.MovieActors,
                                                        a => a.MovieActors.Select(ma => ma.Movie)
                                                       );
 
-            return actors.Select(MapToDto);
+            return (actors.Select(MapToDto), paginationMetadata);
         }
 
         public async Task<ActorDto?> GetAsync(Guid id)

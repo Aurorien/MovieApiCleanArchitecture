@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Movies.Contracts;
 using Movies.Core.Domain.Models.DTOs.ReviewDtos;
+using Movies.Core.Requests;
+using System.Text.Json;
 
 namespace Movies.API.Controllers
 {
@@ -10,6 +12,7 @@ namespace Movies.API.Controllers
     public class ReviewsController : ControllerBase
     {
         private readonly IServiceManager serviceManager;
+        const int maxPageSize = 100;
 
         public ReviewsController(IServiceManager serviceManager)
         {
@@ -19,9 +22,11 @@ namespace Movies.API.Controllers
         // GET: api/Reviews
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<ReviewDto>>> GetReviews()
+        public async Task<ActionResult<IEnumerable<ReviewDto>>> GetReviews([FromQuery] BaseRequestParams requestParams)
         {
-            var reviewDtos = await serviceManager.ReviewService.GetAllAsync();
+            var (reviewDtos, paginationMetadata) = await serviceManager.ReviewService.GetAllAsync(requestParams);
+
+            Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
 
             return Ok(reviewDtos);
         }
