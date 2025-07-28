@@ -64,7 +64,7 @@ namespace Movies.API.Controllers
             if (id == Guid.Empty)
                 return BadRequest(new { message = "Invalid movie ID" });
 
-            var movieDetailedDto = await serviceManager.MovieService.GetDetailedAsync(id, trackChanges: false);
+            var movieDetailedDto = await serviceManager.MovieService.GetDetailedAsync(id);
             if (movieDetailedDto == null)
                 return NotFound();
 
