@@ -1,5 +1,4 @@
-﻿using Movies.Core.Domain.Models.DTOs.ActorDtos;
-using Movies.Core.Domain.Models.DTOs.ReviewDtos;
+﻿using Movies.Core.Domain.Models.DTOs.ReviewDtos;
 
 namespace Movies.Core.Domain.Models.DTOs.MovieDtos
 {
@@ -12,7 +11,7 @@ namespace Movies.Core.Domain.Models.DTOs.MovieDtos
         public string Synopsis { get; set; } = null!;
         public string Language { get; set; } = null!;
         public int Budget { get; set; }
-        public IEnumerable<ActorDto> Actors { get; set; } = Enumerable.Empty<ActorDto>();
+        public IEnumerable<MovieActorDto> Actors { get; set; } = Enumerable.Empty<MovieActorDto>();
         public IEnumerable<ReviewDto> Reviews { get; set; } = Enumerable.Empty<ReviewDto>();
     }
 }
