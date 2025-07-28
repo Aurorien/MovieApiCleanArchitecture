@@ -1,75 +1,76 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Movies.Contracts;
-using Movies.Core.Domain.Models.DTOs.ReviewDtos;
+using Movies.Core.Domain.Models.DTOs.GenreDtos;
 using Movies.Core.Requests;
 using System.Text.Json;
 
 namespace Movies.API.Controllers
 {
-    [Route("api/reviews")]
+
+    [Route("api/genres")]
     [ApiController]
-    public class ReviewsController : ControllerBase
+    public class GenresController : ControllerBase
     {
         private readonly IServiceManager serviceManager;
         const int maxPageSize = 100;
 
-        public ReviewsController(IServiceManager serviceManager)
+        public GenresController(IServiceManager serviceManager)
         {
             this.serviceManager = serviceManager;
         }
 
-        // GET: api/Reviews
+        // GET: api/Genres
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<ReviewDto>>> GetReviews([FromQuery] BaseRequestParams requestParams)
+        public async Task<ActionResult<IEnumerable<GenreDto>>> GetGenres([FromQuery] BaseRequestParams requestParams)
         {
-            var (reviewDtos, paginationMetadata) = await serviceManager.ReviewService.GetAllAsync(requestParams);
+            var (genreDtos, paginationMetadata) = await serviceManager.GenreService.GetAllAsync(requestParams);
 
             Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
 
-            return Ok(reviewDtos);
+            return Ok(genreDtos);
         }
 
 
-        // GET: api/Reviews/5
+        // GET: api/Genres/5
         [HttpGet("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ReviewDto>> GetReview([FromRoute] Guid id)
+        public async Task<ActionResult<GenreDto>> GetGenre([FromRoute] Guid id, [FromQuery] bool includeMovies = false)
         {
             if (id == Guid.Empty)
-                return BadRequest(new { message = "Invalid review ID" });
+                return BadRequest(new { message = "Invalid genre ID" });
 
-            var reviewDto = await serviceManager.ReviewService.GetAsync(id);
+            var genreDto = await serviceManager.GenreService.GetAsync(id, includeMovies);
 
-            if (reviewDto == null)
+            if (genreDto == null)
             {
                 return NotFound();
             }
 
-            return Ok(reviewDto);
+            return Ok(genreDto);
         }
 
 
-        // POST: api/reviews
+        // POST: api/genres
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ReviewDto))]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(GenreDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<ReviewDto>> PostReview([FromBody] ReviewCreateDto createDto)
+        public async Task<ActionResult<GenreDto>> PostGenre([FromBody] GenreCreateDto createDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var reviewDto = await serviceManager.ReviewService.CreateAsync(createDto);
+            var genreDto = await serviceManager.GenreService.CreateAsync(createDto);
 
-            return CreatedAtAction("GetReview", new { id = reviewDto.Id }, reviewDto);
+            return CreatedAtAction("GetGenre", new { id = genreDto.Id }, genreDto);
         }
 
 
-        // PUT: api/Reviews/5
+        // PUT: api/Genres/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -77,16 +78,16 @@ namespace Movies.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> PutReview([FromRoute] Guid id, [FromBody] GenrePutUpdateDto updateDto)
+        public async Task<IActionResult> PutGenre([FromRoute] Guid id, [FromBody] GenrePutUpdateDto updateDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             else if (id == Guid.Empty)
-                return BadRequest(new { message = "Invalid review ID" });
+                return BadRequest(new { message = "Invalid genre ID" });
 
             try
             {
-                var success = await serviceManager.ReviewService.UpdateAsync(id, updateDto);
+                var success = await serviceManager.GenreService.UpdateAsync(id, updateDto);
                 return success ? NoContent() : NotFound();
             }
             catch (DbUpdateConcurrencyException)
@@ -96,26 +97,26 @@ namespace Movies.API.Controllers
             catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new { message = "An error occurred while updating the review" });
+                    new { message = "An error occurred while updating the genre" });
             }
         }
 
 
-        // DELETE: api/Reviews/5
+        // DELETE: api/Genres/5
         [HttpDelete("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteReview([FromRoute] Guid id)
+        public async Task<IActionResult> DeleteGenre([FromRoute] Guid id)
         {
             if (id == Guid.Empty)
-                return BadRequest(new { message = "Invalid review ID" });
+                return BadRequest(new { message = "Invalid genre ID" });
 
             try
             {
-                var success = await serviceManager.ReviewService.DeleteAsync(id);
+                var success = await serviceManager.GenreService.DeleteAsync(id);
                 return success ? NoContent() : NotFound();
             }
             catch (DbUpdateConcurrencyException)
@@ -125,8 +126,11 @@ namespace Movies.API.Controllers
             catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new { message = "An error occurred while deleting the review" });
+                    new { message = "An error occurred while deleting the genre" });
             }
         }
     }
 }
+
+
+

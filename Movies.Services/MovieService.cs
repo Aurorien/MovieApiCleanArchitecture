@@ -47,11 +47,15 @@ namespace Movies.Services
 
         public async Task<MovieDto> CreateAsync(MovieCreateDto createDto)
         {
+            var genreExists = await uow.Genres.AnyAsync(createDto.GenreId);
+            if (!genreExists)
+                throw new ArgumentException("Invalid genre ID");
+
             var movie = new Movie
             {
                 Title = createDto.Title,
                 Year = createDto.Year,
-                Genre = createDto.Genre,
+                GenreId = createDto.GenreId,
                 DurationInMinutes = createDto.DurationInMinutes,
                 MovieDetails = new MovieDetails
                 {
@@ -79,7 +83,7 @@ namespace Movies.Services
 
             movie.Title = updateDto.Title;
             movie.Year = updateDto.Year;
-            movie.Genre = updateDto.Genre;
+            movie.GenreId = updateDto.GenreId;
             movie.DurationInMinutes = updateDto.DurationInMinutes;
             movie.MovieDetails.Synopsis = updateDto.Synopsis;
             movie.MovieDetails.Language = updateDto.Language;
@@ -132,7 +136,7 @@ namespace Movies.Services
                 Id = movie.Id,
                 Title = movie.Title,
                 Year = movie.Year,
-                Genre = movie.Genre,
+                Genre = movie.Genre.Name,
                 DurationInMinutes = movie.DurationInMinutes,
             };
         }
@@ -144,7 +148,7 @@ namespace Movies.Services
             {
                 Title = movie.Title,
                 Year = movie.Year,
-                Genre = movie.Genre,
+                Genre = movie.Genre.Name,
                 DurationInMinutes = movie.DurationInMinutes,
                 Synopsis = movie.MovieDetails.Synopsis,
                 Language = movie.MovieDetails.Language,

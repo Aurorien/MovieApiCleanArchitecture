@@ -52,7 +52,7 @@ namespace Movies.Services
         }
 
 
-        public async Task<bool> UpdateAsync(Guid id, ReviewPutUpdateDto updateDto)
+        public async Task<bool> UpdateAsync(Guid id, GenrePutUpdateDto updateDto)
         {
             var review = await uow.Reviews.GetReviewAsync(id, trackChanges: true);
             if (review == null)
@@ -79,6 +79,7 @@ namespace Movies.Services
             }
         }
 
+
         public async Task<bool> DeleteAsync(Guid id)
         {
             if (!await uow.Reviews.AnyAsync(id))
@@ -101,6 +102,7 @@ namespace Movies.Services
                 throw;
             }
         }
+
 
         private ReviewDto MapToDto(Review review)
         {

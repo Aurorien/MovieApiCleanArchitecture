@@ -19,6 +19,7 @@ namespace Movies.Data.Repositories
             var paginationMetadata = new PaginationMetadata(totalItemCount, requestParams.PageSize, requestParams.Page);
 
             query = query.Include(m => m.MovieDetails)
+                         .Include(m => m.Genre)
                          .OrderBy(m => m.Title)
                          .Skip(requestParams.PageSize * (requestParams.Page - 1))
                          .Take(requestParams.PageSize);
@@ -39,6 +40,7 @@ namespace Movies.Data.Repositories
         {
             return await FindAll(trackChanges)
                 .Include(m => m.MovieDetails)
+                .Include(m => m.Genre)
                 .Include(m => m.MovieActors)
                     .ThenInclude(ma => ma.Actor)
                 .Include(m => m.Reviews)

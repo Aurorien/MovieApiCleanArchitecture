@@ -1,4 +1,4 @@
-﻿namespace Movies.Core.Domain.Models.DTOs.ReviewDtos
+﻿namespace Movies.Core.Domain.Models.DTOs.GenreDtos
 {
     public class GenrePutUpdateDto : GenreManipulationDto
     {

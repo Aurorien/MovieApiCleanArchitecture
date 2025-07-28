@@ -10,6 +10,7 @@ namespace Movies.Data
         public DbSet<Movie> Movie { get; set; } = default!;
         public DbSet<Actor> Actor { get; set; } = default!;
         public DbSet<Review> Review { get; set; } = default!;
+        public DbSet<Genre> Genre { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

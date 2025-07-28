@@ -16,7 +16,10 @@ namespace Movies.Data
             var actors = GenerateActors(3);
             await context.AddRangeAsync(actors);
 
-            var movies = GenerateMovies(20);
+            var genres = GenerateGenres(10);
+            await context.AddRangeAsync(genres);
+
+            var movies = GenerateMovies(genres, 20);
             await context.AddRangeAsync(movies);
 
             await context.SaveChangesAsync();
@@ -29,6 +32,7 @@ namespace Movies.Data
 
             await context.SaveChangesAsync();
         }
+
 
         private static IEnumerable<MovieActor> GenerateMovieActors(IEnumerable<Movie> movies, IEnumerable<Actor> actors)
         {
@@ -59,7 +63,7 @@ namespace Movies.Data
         }
 
 
-        private static IEnumerable<Movie> GenerateMovies(int numberOfMovies)
+        private static IEnumerable<Movie> GenerateMovies(IEnumerable<Genre> genres, int numberOfMovies)
         {
             var movies = new List<Movie>();
 
@@ -68,14 +72,14 @@ namespace Movies.Data
                 //var title = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(faker.Commerce.ProductName());
                 var title = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(faker.Company.CompanyName());
                 var year = faker.Random.Int(1878, 2100);
-                var genre = GetRandomMovieGenre();
+                var genre = faker.PickRandom(genres);
                 var durationInMinutes = faker.Random.Int(1, 55000);
 
                 var movie = new Movie
                 {
                     Title = title,
                     Year = year,
-                    Genre = genre,
+                    GenreId = genre.Id,
                     DurationInMinutes = durationInMinutes,
                     MovieDetails = new MovieDetails
                     {
@@ -115,6 +119,7 @@ namespace Movies.Data
             return actors;
         }
 
+
         private static IEnumerable<Review> GenerateReviews(IEnumerable<Movie> movies, int totalReviews)
         {
             var reviews = new List<Review>();
@@ -136,6 +141,25 @@ namespace Movies.Data
 
             return reviews;
         }
+
+
+        private static IEnumerable<Genre> GenerateGenres(int totalGenres)
+        {
+            var genres = new List<Genre>();
+
+            for (int i = 0; i < totalGenres; i++)
+            {
+                var genre = new Genre
+                {
+                    Name = GetRandomMovieGenre(),
+                };
+
+                genres.Add(genre);
+            }
+
+            return genres;
+        }
+
 
         private static string GetRandomLanguage()
         {

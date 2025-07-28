@@ -5,5 +5,6 @@
         IActorService ActorService { get; }
         IMovieService MovieService { get; }
         IReviewService ReviewService { get; }
+        IGenreService GenreService { get; }
     }
 }

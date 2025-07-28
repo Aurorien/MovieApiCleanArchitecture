@@ -1,6 +1,6 @@
 ﻿namespace Movies.Core.Domain.Models.DTOs.ReviewDtos
 {
-    public class ReviewCreateDto : ReviewManipulationDto
+    public class ReviewCreateDto : GenreManipulationDto
     {
     }
 }

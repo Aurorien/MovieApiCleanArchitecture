@@ -2,7 +2,7 @@
 
 namespace Movies.Core.Domain.Models.DTOs.ReviewDtos
 {
-    public class ReviewManipulationDto
+    public class GenreManipulationDto
     {
         [Required]
         public string ReviewerName { get; set; } = null!;

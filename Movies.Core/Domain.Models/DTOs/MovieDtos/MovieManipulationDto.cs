@@ -14,7 +14,7 @@ namespace Movies.Core.Domain.Models.DTOs.MovieDtos
 
         [Required]
         [StringLength(50)]
-        public string Genre { get; set; } = null!;
+        public Guid GenreId { get; set; }
 
         [Required]
         [Range(1, 55000)]
