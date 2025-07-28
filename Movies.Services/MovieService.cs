@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Movies.Contracts;
 using Movies.Core.Domain.Contracts;
-using Movies.Core.Domain.Models.DTOs.ActorDtos;
 using Movies.Core.Domain.Models.DTOs.MovieDtos;
 using Movies.Core.Domain.Models.DTOs.ReviewDtos;
 using Movies.Core.Domain.Models.Entities;
@@ -18,38 +17,33 @@ namespace Movies.Services
             this.uow = uow;
         }
 
+
         public async Task<bool> AnyAsync(Guid id) => await uow.Movies.AnyAsync(id);
+
 
         public async Task<(IEnumerable<MovieDto>, PaginationMetadata)> GetAllAsync(BaseRequestParams requestParams)
         {
-            var (movies, paginationMetadata) = await uow.Movies.GetAllAsync(trackChanges: false,
-                                                       requestParams,
-                                                       m => m.MovieDetails
-                                                      );
+            var (movies, paginationMetadata) = await uow.Movies.GetAllMoviesAsync(trackChanges: false, requestParams);
 
             return (movies.Select(MapToDto), paginationMetadata);
         }
 
+
         public async Task<MovieDto?> GetAsync(Guid id)
         {
-            var movie = await uow.Movies.GetAsync(id, trackChanges: false,
-                                                   m => m.MovieDetails
-                                                  );
+            var movie = await uow.Movies.GetMovieAsync(id, trackChanges: false);
 
             return movie != null ? MapToDto(movie) : null;
         }
 
-        public async Task<MovieDetailedDto?> GetDetailedAsync(Guid id, bool trackChanges = false)
+
+        public async Task<MovieDetailedDto?> GetDetailedAsync(Guid id)
         {
-            var movie = await uow.Movies.GetAsync(id, trackChanges,
-                                                   m => m.MovieDetails,
-                                                   m => m.MovieActors.Select(ma => ma.Actor),
-                                                   m => m.MovieActors.Select(ma => ma.Actor.MovieActors),
-                                                   m => m.Reviews
-                                                  );
+            var movie = await uow.Movies.GetMovieDetailedAsync(id, trackChanges: false);
 
             return movie != null ? MapToDetailedDto(movie) : null;
         }
+
 
         public async Task<MovieDto> CreateAsync(MovieCreateDto createDto)
         {
@@ -74,9 +68,10 @@ namespace Movies.Services
             return MapToDto(movie);
         }
 
+
         public async Task<bool> UpdateAsync(Guid id, MoviePutUpdateDto updateDto)
         {
-            var movie = await uow.Movies.GetAsync(id, trackChanges: true);
+            var movie = await uow.Movies.GetMovieAsync(id, trackChanges: true);
             if (movie == null)
             {
                 return false;
@@ -105,6 +100,7 @@ namespace Movies.Services
             }
         }
 
+
         public async Task<bool> DeleteAsync(Guid id)
         {
             if (!await uow.Movies.AnyAsync(id))
@@ -128,6 +124,7 @@ namespace Movies.Services
             }
         }
 
+
         private MovieDto MapToDto(Movie movie)
         {
             return new MovieDto
@@ -137,9 +134,9 @@ namespace Movies.Services
                 Year = movie.Year,
                 Genre = movie.Genre,
                 DurationInMinutes = movie.DurationInMinutes,
-                MovieDetailsLanguage = movie.MovieDetails.Language
             };
         }
+
 
         private MovieDetailedDto MapToDetailedDto(Movie movie)
         {
@@ -152,17 +149,12 @@ namespace Movies.Services
                 Synopsis = movie.MovieDetails.Synopsis,
                 Language = movie.MovieDetails.Language,
                 Budget = movie.MovieDetails.Budget,
-                Actors = movie.MovieActors.Select(ma => new ActorDto
+                Actors = movie.MovieActors.Select(ma => new MovieActorDto
                 {
                     Id = ma.Actor.Id,
                     FullName = ma.Actor.FullName,
                     BirthYear = ma.Actor.BirthYear,
-                    MovieTitles = ma.Actor.MovieActors.Select(am => new MovieTitlesDto
-                    {
-                        Id = am.Movie.Id,
-                        Title = am.Movie.Title,
-                        Role = am.Role
-                    })
+                    Role = ma.Role,
                 }),
                 Reviews = movie.Reviews.Select(r => new ReviewDto
                 {

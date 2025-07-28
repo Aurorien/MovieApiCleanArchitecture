@@ -16,23 +16,25 @@ namespace Movies.Services
             this.uow = uow;
         }
 
+
         public async Task<bool> AnyAsync(Guid id) => await uow.Reviews.AnyAsync(id);
+
 
         public async Task<(IEnumerable<ReviewDto>, PaginationMetadata)> GetAllAsync(BaseRequestParams requestParams)
         {
-            var (reviews, paginationMetadata) = await uow.Reviews.GetAllAsync(trackChanges: false,
-                                                       requestParams
-                                                       );
+            var (reviews, paginationMetadata) = await uow.Reviews.GetAllReviewsAsync(trackChanges: false, requestParams);
 
             return (reviews.Select(MapToDto), paginationMetadata);
         }
 
+
         public async Task<ReviewDto?> GetAsync(Guid id)
         {
-            var review = await uow.Reviews.GetAsync(id, trackChanges: false);
+            var review = await uow.Reviews.GetReviewAsync(id, trackChanges: false);
 
             return review != null ? MapToDto(review) : null;
         }
+
 
         public async Task<ReviewDto> CreateAsync(ReviewCreateDto createDto)
         {
@@ -49,9 +51,10 @@ namespace Movies.Services
             return MapToDto(review);
         }
 
+
         public async Task<bool> UpdateAsync(Guid id, ReviewPutUpdateDto updateDto)
         {
-            var review = await uow.Reviews.GetAsync(id, trackChanges: true);
+            var review = await uow.Reviews.GetReviewAsync(id, trackChanges: true);
             if (review == null)
             {
                 return false;
@@ -98,6 +101,7 @@ namespace Movies.Services
                 throw;
             }
         }
+
         private ReviewDto MapToDto(Review review)
         {
             return new ReviewDto

@@ -17,28 +17,25 @@ namespace Movies.Services
             this.uow = uow;
         }
 
+
         public async Task<bool> AnyAsync(Guid id) => await uow.Actors.AnyAsync(id);
+
 
         public async Task<(IEnumerable<ActorDto>, PaginationMetadata)> GetAllAsync(BaseRequestParams requestParams)
         {
-            var (actors, paginationMetadata) = await uow.Actors.GetAllAsync(trackChanges: false,
-                                                       requestParams,
-                                                       a => a.MovieActors,
-                                                       a => a.MovieActors.Select(ma => ma.Movie)
-                                                      );
+            var (actors, paginationMetadata) = await uow.Actors.GetAllActorsAsync(trackChanges: false, requestParams);
 
             return (actors.Select(MapToDto), paginationMetadata);
         }
 
+
         public async Task<ActorDto?> GetAsync(Guid id)
         {
-            var actor = await uow.Actors.GetAsync(id, trackChanges: false,
-                                                   a => a.MovieActors,
-                                                   a => a.MovieActors.Select(ma => ma.Movie)
-                                                  );
+            var actor = await uow.Actors.GetActorAsync(id, trackChanges: false);
 
             return actor != null ? MapToDto(actor) : null;
         }
+
 
         public async Task<ActorDto> CreateAsync(ActorCreateDto createDto)
         {
@@ -59,6 +56,8 @@ namespace Movies.Services
         {
             return await uow.Actors.IsActorInMovieAsync(movieId, actorId);
         }
+
+
         public async Task<bool> AddActorToMovieAsync(Guid movieId, Guid actorId, string role)
         {
             if (await uow.Actors.IsActorInMovieAsync(movieId, actorId))
@@ -94,9 +93,10 @@ namespace Movies.Services
             }
         }
 
+
         public async Task<bool> UpdateAsync(Guid id, ActorPutUpdateDto updateDto)
         {
-            var actor = await uow.Actors.GetAsync(id, trackChanges: true);
+            var actor = await uow.Actors.GetActorAsync(id, trackChanges: true);
             if (actor == null)
             {
                 return false;
@@ -121,6 +121,7 @@ namespace Movies.Services
             }
         }
 
+
         public async Task<bool> DeleteAsync(Guid id)
         {
             if (!await uow.Actors.AnyAsync(id))
@@ -143,6 +144,7 @@ namespace Movies.Services
                 throw;
             }
         }
+
 
         private ActorDto MapToDto(Actor actor)
         {
