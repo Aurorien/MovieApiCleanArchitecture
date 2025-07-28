@@ -20,6 +20,7 @@ namespace Movies.API.Controllers
             this.serviceManager = serviceManager;
         }
 
+
         // GET: api/Genres
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]

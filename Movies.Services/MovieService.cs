@@ -49,7 +49,7 @@ namespace Movies.Services
         {
             var genreExists = await uow.Genres.AnyAsync(createDto.GenreId);
             if (!genreExists)
-                throw new ArgumentException("Invalid genre ID");
+                throw new ArgumentException("Invalid GenreId");
 
             var movie = new Movie
             {
@@ -75,6 +75,10 @@ namespace Movies.Services
 
         public async Task<bool> UpdateAsync(Guid id, MoviePutUpdateDto updateDto)
         {
+            var genreExists = await uow.Genres.AnyAsync(updateDto.GenreId);
+            if (!genreExists)
+                throw new ArgumentException("Invalid GenreId");
+
             var movie = await uow.Movies.GetMovieAsync(id, trackChanges: true);
             if (movie == null)
             {

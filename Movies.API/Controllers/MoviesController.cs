@@ -76,15 +76,26 @@ namespace Movies.API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(MovieDto))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
         public async Task<ActionResult<MovieDto>> PostMovie([FromBody] MovieCreateDto createDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var movieDto = await serviceManager.MovieService.CreateAsync(createDto);
-
-            return CreatedAtAction("GetMovie", new { id = movieDto.Id }, movieDto);
+            try
+            {
+                var movieDto = await serviceManager.MovieService.CreateAsync(createDto);
+                return CreatedAtAction("GetMovie", new { id = movieDto.Id }, movieDto);
+            }
+            catch (ArgumentException ex)
+            {
+                return Problem(
+                    detail: ex.Message,
+                    statusCode: StatusCodes.Status400BadRequest,
+                    title: "Invalid GenreId. Does not exist in database.",
+                    type: "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+                );
+            }
         }
 
 
@@ -107,6 +118,15 @@ namespace Movies.API.Controllers
             {
                 var success = await serviceManager.MovieService.UpdateAsync(id, updateDto);
                 return success ? NoContent() : NotFound();
+            }
+            catch (ArgumentException ex)
+            {
+                return Problem(
+                    detail: ex.Message,
+                    statusCode: StatusCodes.Status400BadRequest,
+                    title: "Invalid GenreId. Does not exist in database.",
+                    type: "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+                );
             }
             catch (DbUpdateConcurrencyException)
             {
