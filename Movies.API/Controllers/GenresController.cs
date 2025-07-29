@@ -65,9 +65,15 @@ namespace Movies.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var genreDto = await serviceManager.GenreService.CreateAsync(createDto);
-
-            return CreatedAtAction("GetGenre", new { id = genreDto.Id }, genreDto);
+            try
+            {
+                var genreDto = await serviceManager.GenreService.CreateAsync(createDto);
+                return CreatedAtAction("GetGenre", new { id = genreDto.Id }, genreDto);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { message = ex.Message });
+            }
         }
 
 
@@ -90,6 +96,10 @@ namespace Movies.API.Controllers
             {
                 var success = await serviceManager.GenreService.UpdateAsync(id, updateDto);
                 return success ? NoContent() : NotFound();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { message = ex.Message });
             }
             catch (DbUpdateConcurrencyException)
             {

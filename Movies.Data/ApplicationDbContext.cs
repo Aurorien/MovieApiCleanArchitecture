@@ -29,6 +29,11 @@ namespace Movies.Data
                 .WithMany(m => m.MovieActors)
                 .HasForeignKey(ma => ma.MovieId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Genre>() // Add index for performance optimization
+                .HasIndex(g => g.Name)
+                .IsUnique()
+                .HasDatabaseName("UQ_Genre_Name");
         }
     }
 }

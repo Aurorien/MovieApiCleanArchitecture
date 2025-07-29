@@ -7,5 +7,6 @@ namespace Movies.Core.Domain.Contracts
     {
         Task<(IEnumerable<Genre>, PaginationMetadata)> GetAllGenresAsync(bool trackChanges, BaseRequestParams requestParams);
         Task<Genre?> GetGenreAsync(Guid id, bool trackChanges, bool includeMovies);
+        Task<bool> ExistsByNameAsync(string name, Guid? excludeId = null);
     }
 }

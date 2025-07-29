@@ -31,5 +31,19 @@ namespace Movies.Data.Repositories
         {
             return await FindAll(trackChanges).Include(m => m.Movies).FirstOrDefaultAsync(r => r.Id == id);
         }
+
+
+        public async Task<bool> ExistsByNameAsync(string name, Guid? excludeId = null)
+        {
+            var query = FindAll(trackChanges: false)
+                .Where(g => g.Name.ToLower() == name.ToLower());
+
+            if (excludeId.HasValue)
+            {
+                query = query.Where(g => g.Id != excludeId.Value);
+            }
+
+            return await query.AnyAsync();
+        }
     }
 }

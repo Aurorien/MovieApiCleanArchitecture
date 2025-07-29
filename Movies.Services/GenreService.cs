@@ -41,6 +41,12 @@ namespace Movies.Services
 
         public async Task<GenreDto> CreateAsync(GenreCreateDto createDto)
         {
+            var nameExists = await uow.Genres.ExistsByNameAsync(createDto.Name);
+            if (nameExists)
+            {
+                throw new InvalidOperationException($"A genre with the name '{createDto.Name}' already exists.");
+            }
+
             var genre = new Genre
             {
                 Name = createDto.Name,
@@ -59,6 +65,12 @@ namespace Movies.Services
             if (genre == null)
             {
                 return false;
+            }
+
+            var nameExists = await uow.Genres.ExistsByNameAsync(updateDto.Name, excludeId: id);
+            if (nameExists)
+            {
+                throw new InvalidOperationException($"A genre with the name '{updateDto.Name}' already exists.");
             }
 
             genre.Name = updateDto.Name;
