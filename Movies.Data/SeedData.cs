@@ -1,6 +1,7 @@
 ﻿using Bogus;
 using Microsoft.EntityFrameworkCore;
 using Movies.Core.Domain.Models.Entities;
+using System.Diagnostics;
 using System.Globalization;
 
 namespace Movies.Data
@@ -8,6 +9,16 @@ namespace Movies.Data
     public class SeedData
     {
         private static Faker faker = new Faker();
+
+        private static readonly string[] _genres =
+{
+        "Action", "Adventure", "Comedy", "Drama", "Fantasy",
+        "Horror", "Mystery", "Romance", "Sci-Fi", "Thriller",
+        "Western", "Crime", "Documentary", "Animation", "Musical"
+    };
+        private static int _maxAvailableGenres => _genres.Length;
+
+
         public static async Task InitAsync(ApplicationDbContext context)
         {
 
@@ -16,11 +27,18 @@ namespace Movies.Data
             var actors = GenerateActors(3);
             await context.AddRangeAsync(actors);
 
-            var genres = GenerateGenres(10);
+            var genres = GenerateUniqueGenres(10);
             await context.AddRangeAsync(genres);
+
+            await context.SaveChangesAsync();
 
             var movies = GenerateMovies(genres, 20);
             await context.AddRangeAsync(movies);
+
+            await context.SaveChangesAsync();
+
+            var movieDetails = GenerateMovieDetails(movies);
+            await context.AddRangeAsync(movieDetails);
 
             await context.SaveChangesAsync();
 
@@ -34,7 +52,7 @@ namespace Movies.Data
         }
 
 
-        private static IEnumerable<MovieActor> GenerateMovieActors(IEnumerable<Movie> movies, IEnumerable<Actor> actors)
+        private static List<MovieActor> GenerateMovieActors(List<Movie> movies, List<Actor> actors)
         {
             var movieActors = new List<MovieActor>();
 
@@ -63,7 +81,7 @@ namespace Movies.Data
         }
 
 
-        private static IEnumerable<Movie> GenerateMovies(IEnumerable<Genre> genres, int numberOfMovies)
+        private static List<Movie> GenerateMovies(List<Genre> genres, int numberOfMovies)
         {
             var movies = new List<Movie>();
 
@@ -79,20 +97,35 @@ namespace Movies.Data
                 {
                     Title = title,
                     Year = year,
-                    GenreId = genre.Id,
                     DurationInMinutes = durationInMinutes,
-                    MovieDetails = new MovieDetails
-                    {
-                        Synopsis = faker.Lorem.Paragraph(5),
-                        Language = GetRandomLanguage(),
-                        Budget = faker.Random.Int(1, int.MaxValue)
-                    }
+                    GenreId = genre.Id
                 };
 
                 movies.Add(movie);
             }
 
             return movies;
+        }
+
+
+        private static List<MovieDetails> GenerateMovieDetails(List<Movie> movies)
+        {
+            var movieDetails = new List<MovieDetails>();
+
+            foreach (var movie in movies)
+            {
+                var movieDetail = new MovieDetails
+                {
+                    Synopsis = faker.Lorem.Paragraph(5),
+                    Language = GetRandomLanguage(),
+                    Budget = faker.Random.Int(1, int.MaxValue),
+                    MovieId = movie.Id
+                };
+
+                movieDetails.Add(movieDetail);
+            }
+
+            return movieDetails;
         }
 
 
@@ -120,7 +153,7 @@ namespace Movies.Data
         }
 
 
-        private static IEnumerable<Review> GenerateReviews(IEnumerable<Movie> movies, int totalReviews)
+        private static List<Review> GenerateReviews(List<Movie> movies, int totalReviews)
         {
             var reviews = new List<Review>();
 
@@ -143,24 +176,6 @@ namespace Movies.Data
         }
 
 
-        private static IEnumerable<Genre> GenerateGenres(int totalGenres)
-        {
-            var genres = new List<Genre>();
-
-            for (int i = 0; i < totalGenres; i++)
-            {
-                var genre = new Genre
-                {
-                    Name = GetRandomMovieGenre(),
-                };
-
-                genres.Add(genre);
-            }
-
-            return genres;
-        }
-
-
         private static string GetRandomLanguage()
         {
             var cultures = new[]
@@ -180,19 +195,20 @@ namespace Movies.Data
             return faker.PickRandom(cultures);
         }
 
-        private static string GetRandomMovieGenre()
+        private static List<Genre> GenerateUniqueGenres(int count)
         {
-
-            var movieGenres = new[]
+            if (count > _maxAvailableGenres)
             {
-                "Action", "Adventure", "Comedy", "Drama", "Fantasy",
-                "Horror", "Mystery", "Romance", "Sci-Fi", "Thriller",
-                "Western", "Crime", "Documentary", "Animation", "Musical"
-            };
+                Debug.WriteLine($"Requested {count} genres reduced to {_maxAvailableGenres}");
+                count = _maxAvailableGenres;
+            }
 
-            return faker.PickRandom(movieGenres);
+            var faker = new Faker();
+            return faker.PickRandom(_genres, count)
+                       .Select(name => new Genre { Name = name })
+            .ToList();
         }
-
     }
 }
+
 
