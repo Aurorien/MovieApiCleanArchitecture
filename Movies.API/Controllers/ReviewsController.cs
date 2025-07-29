@@ -77,7 +77,7 @@ namespace Movies.API.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PutReview([FromRoute] Guid id, [FromBody] GenrePutUpdateDto updateDto)
         {
-            else if (id == Guid.Empty)
+            if (id == Guid.Empty)
                 return BadRequest(new { message = "Invalid review ID" });
 
             try

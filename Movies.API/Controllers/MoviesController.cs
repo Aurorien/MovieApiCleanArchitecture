@@ -106,7 +106,7 @@ namespace Movies.API.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PutMovie([FromRoute] Guid id, [FromBody] MoviePutUpdateDto updateDto)
         {
-            else if (id == Guid.Empty)
+            if (id == Guid.Empty)
                 return BadRequest(new { message = "Invalid movie ID" });
 
             try
