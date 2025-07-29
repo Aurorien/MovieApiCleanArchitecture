@@ -62,9 +62,6 @@ namespace Movies.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<GenreDto>> PostGenre([FromBody] GenreCreateDto createDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             try
             {
                 var genreDto = await serviceManager.GenreService.CreateAsync(createDto);
@@ -87,8 +84,6 @@ namespace Movies.API.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PutGenre([FromRoute] Guid id, [FromBody] GenrePutUpdateDto updateDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
             else if (id == Guid.Empty)
                 return BadRequest(new { message = "Invalid genre ID" });
 

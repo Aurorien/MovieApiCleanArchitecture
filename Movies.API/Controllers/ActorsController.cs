@@ -61,9 +61,6 @@ namespace Movies.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ActorDto>> PostActor([FromBody] ActorCreateDto createDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var actorDto = await serviceManager.ActorService.CreateAsync(createDto);
 
             return CreatedAtAction("GetActor", new { id = actorDto.Id }, actorDto);
@@ -120,8 +117,6 @@ namespace Movies.API.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PutActor([FromRoute] Guid id, [FromBody] ActorPutUpdateDto updateDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
             else if (id == Guid.Empty)
                 return BadRequest(new { message = "Invalid actor ID" });
 

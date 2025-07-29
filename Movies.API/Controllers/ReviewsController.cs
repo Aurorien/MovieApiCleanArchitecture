@@ -61,9 +61,6 @@ namespace Movies.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ReviewDto>> PostReview([FromBody] ReviewCreateDto createDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var reviewDto = await serviceManager.ReviewService.CreateAsync(createDto);
 
             return CreatedAtAction("GetReview", new { id = reviewDto.Id }, reviewDto);
@@ -80,8 +77,6 @@ namespace Movies.API.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PutReview([FromRoute] Guid id, [FromBody] GenrePutUpdateDto updateDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
             else if (id == Guid.Empty)
                 return BadRequest(new { message = "Invalid review ID" });
 
