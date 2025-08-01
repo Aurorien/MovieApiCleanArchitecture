@@ -61,6 +61,10 @@ namespace Movies.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ReviewDto>> PostReview([FromBody] ReviewCreateDto createDto)
         {
+            var isMaxReviews = await serviceManager.ReviewService.IsMaxReviews(createDto.MovieId);
+            if (isMaxReviews)
+                return BadRequest(new { message = "Not possible to add more reviews to movie. Max limit of reviews for movie was reached." });
+
             var reviewDto = await serviceManager.ReviewService.CreateAsync(createDto);
 
             return CreatedAtAction("GetReview", new { id = reviewDto.Id }, reviewDto);

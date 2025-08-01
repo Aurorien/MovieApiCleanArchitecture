@@ -10,6 +10,7 @@ namespace Movies.Services
     public class ReviewService : IReviewService
     {
         private readonly IUnitOfWork uow;
+        const int maxReviewsInMovie = 10;
 
         public ReviewService(IUnitOfWork uow)
         {
@@ -33,6 +34,12 @@ namespace Movies.Services
             var review = await uow.Reviews.GetReviewAsync(id, trackChanges: false);
 
             return review != null ? MapToDto(review) : null;
+        }
+
+        public async Task<bool> IsMaxReviews(Guid movieId)
+        {
+            var reviewsInMovie = await uow.Reviews.GetTotalReviewsInMovieAsync(movieId);
+            return maxReviewsInMovie > reviewsInMovie ? false : true;
         }
 
 

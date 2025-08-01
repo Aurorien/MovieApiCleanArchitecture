@@ -31,5 +31,13 @@ namespace Movies.Data.Repositories
         {
             return await FindAll(trackChanges).FirstOrDefaultAsync(r => r.Id == id);
         }
+
+
+        public async Task<int> GetTotalReviewsInMovieAsync(Guid movieId, bool trackChanges = false)
+        {
+            return await FindAll(trackChanges)
+                .Where(r => r.MovieId == movieId)
+                .CountAsync();
+        }
     }
 }
