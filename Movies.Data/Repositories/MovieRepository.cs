@@ -46,5 +46,13 @@ namespace Movies.Data.Repositories
                 .Include(m => m.Reviews)
                 .FirstOrDefaultAsync(m => m.Id == id);
         }
+
+        public async Task<int> GetMovieYear(Guid id, bool trackChanges = false)
+        {
+            return await FindAll(trackChanges)
+                .Where(m => m.Id == id)
+                .Select(m => m.Year)
+                .FirstOrDefaultAsync();
+        }
     }
 }

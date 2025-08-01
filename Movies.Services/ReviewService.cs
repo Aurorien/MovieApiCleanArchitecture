@@ -10,7 +10,9 @@ namespace Movies.Services
     public class ReviewService : IReviewService
     {
         private readonly IUnitOfWork uow;
-        const int maxReviewsInMovie = 10;
+        private const int maxReviewsInMovie = 10;
+        private const int maxReviewsInOldMovie = 5;
+        private const int oldMovieAgeLimit = 20;
 
         public ReviewService(IUnitOfWork uow)
         {
@@ -38,8 +40,15 @@ namespace Movies.Services
 
         public async Task<bool> IsMaxReviews(Guid movieId)
         {
+            int movieYear = await uow.Movies.GetMovieYear(movieId, trackChanges: false);
+            int movieAge = DateTime.Now.Year - movieYear;
+
             var reviewsInMovie = await uow.Reviews.GetTotalReviewsInMovieAsync(movieId);
-            return maxReviewsInMovie > reviewsInMovie ? false : true;
+
+            return oldMovieAgeLimit > movieAge ?
+                maxReviewsInMovie > reviewsInMovie ? false : true
+                :
+                maxReviewsInOldMovie > reviewsInMovie ? false : true;
         }
 
 

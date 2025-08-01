@@ -8,5 +8,6 @@ namespace Movies.Core.Domain.Contracts
         Task<(IEnumerable<Movie>, PaginationMetadata)> GetAllMoviesAsync(bool trackChanges, BaseRequestParams requestParams);
         Task<Movie?> GetMovieAsync(Guid id, bool trackChanges);
         Task<Movie?> GetMovieDetailedAsync(Guid id, bool trackChanges = false);
+        Task<int> GetMovieYear(Guid id, bool trackChanges = false)
     }
 }
