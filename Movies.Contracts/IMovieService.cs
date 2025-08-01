@@ -6,5 +6,9 @@ namespace Movies.Contracts
     {
         Task<MovieDto?> GetAsync(Guid id);
         Task<MovieDetailedDto?> GetDetailedAsync(Guid id);
+        Task<bool> IsMovieDocumentaryAsync(Guid movieId);
+        Task<bool> IsGenreIdDocumentaryAsync(Guid genreId);
+        Task<bool> IsDocumentaryActorLimitReachedAsync(Guid movieId);
+        Task<bool> IsDocumentaryBudgetLimitReachedAsync(Guid genreId);
     }
 }

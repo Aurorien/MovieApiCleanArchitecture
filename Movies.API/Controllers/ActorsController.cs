@@ -89,6 +89,15 @@ namespace Movies.API.Controllers
                 if (!actorExists)
                     return NotFound("Actor not found");
 
+                bool isMovieDocumentary = await serviceManager.MovieService.IsMovieDocumentaryAsync(movieId);
+                if (isMovieDocumentary)
+                {
+                    var isActorLimitReached = await serviceManager.MovieService.IsDocumentaryActorLimitReachedAsync(movieId);
+
+                    if (isActorLimitReached)
+                        return BadRequest("Not possible to add more actors to movie. The documentary has already reached its limit of actors.");
+                }
+
                 var success = await serviceManager.ActorService.AddActorToMovieAsync(movieId, maCreateDto.ActorId, maCreateDto.Role);
 
                 if (!success)
@@ -97,6 +106,10 @@ namespace Movies.API.Controllers
                 return NoContent();
             }
             catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (ArgumentException ex)
             {
                 return BadRequest(new { message = ex.Message });
             }

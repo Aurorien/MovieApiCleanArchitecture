@@ -49,7 +49,13 @@ namespace Movies.Services
         {
             var genreExists = await uow.Genres.AnyAsync(createDto.GenreId);
             if (!genreExists)
-                throw new ArgumentException("Invalid GenreId");
+                throw new ArgumentException("Invalid GenreId. Genre does not exist in db.");
+
+            var isDocumentary = await IsGenreIdDocumentaryAsync(createDto.GenreId);
+            if (isDocumentary && await IsDocumentaryBudgetLimitReachedAsync(createDto.GenreId))
+            {
+                throw new ArgumentException("Invalid budget. Genre documentary has a limit of 1,000,000 in budget.");
+            }
 
             var movie = new Movie
             {
@@ -77,7 +83,13 @@ namespace Movies.Services
         {
             var genreExists = await uow.Genres.AnyAsync(updateDto.GenreId);
             if (!genreExists)
-                throw new ArgumentException("Invalid GenreId");
+                throw new ArgumentException("Invalid GenreId. Genre does not exist in db.");
+
+            var isDocumentary = await IsGenreIdDocumentaryAsync(updateDto.GenreId);
+            if (isDocumentary && await IsDocumentaryBudgetLimitReachedAsync(updateDto.GenreId))
+            {
+                throw new ArgumentException("Invalid budget. Genre documentary has a limit of 1,000,000 in budget.");
+            }
 
             var movie = await uow.Movies.GetMovieAsync(id, trackChanges: true);
             if (movie == null)
@@ -131,6 +143,60 @@ namespace Movies.Services
                 throw;
             }
         }
+
+
+        public async Task<bool> IsMovieDocumentaryAsync(Guid movieId)
+        {
+            var movieExists = await uow.Movies.AnyAsync(movieId);
+            if (!movieExists)
+            {
+                throw new ArgumentException($"Movie with ID {movieId} does not exist.");
+            }
+
+            return await uow.Movies.IsMovieOfGenreAsync(movieId, genreName: "documentary");
+        }
+
+
+        public async Task<bool> IsGenreIdDocumentaryAsync(Guid genreId)
+        {
+            var genre = await uow.Genres.GetGenreAsync(genreId, trackChanges: false, includeMovies: false);
+
+            if (genre == null)
+            {
+                throw new ArgumentException($"Genre with ID {genreId} does not exist.");
+            }
+
+            return genre.Name.Trim().ToLower() == "documentary";
+        }
+
+
+        public async Task<bool> IsDocumentaryActorLimitReachedAsync(Guid movieId)
+        {
+            bool isDocumentary = await IsMovieDocumentaryAsync(movieId);
+            if (!isDocumentary)
+            {
+                throw new ArgumentException($"Movie with ID {movieId} is not a documentary.");
+            }
+
+            var numberOfActorsInMovie = await uow.Actors.NumberOfActorsInMovieAsync(movieId);
+
+            return numberOfActorsInMovie <= 10;
+        }
+
+
+        public async Task<bool> IsDocumentaryBudgetLimitReachedAsync(Guid genreId)
+        {
+            bool isDocumentary = await IsGenreIdDocumentaryAsync(genreId);
+            if (!isDocumentary)
+            {
+                throw new ArgumentException($"Genre with ID {genreId} is not documentary.");
+            }
+
+            var movieBudget = await uow.Movies.GetMovieBudgetAsync(genreId, trackChanges: false);
+
+            return movieBudget <= 1000000;
+        }
+
 
 
         private MovieDto MapToDto(Movie movie)

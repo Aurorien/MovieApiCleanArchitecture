@@ -5,6 +5,7 @@ using Movies.Core.Domain.Models.DTOs.ActorDtos;
 using Movies.Core.Domain.Models.DTOs.MovieDtos;
 using Movies.Core.Domain.Models.Entities;
 using Movies.Core.Requests;
+using System.Data;
 
 namespace Movies.Services
 {

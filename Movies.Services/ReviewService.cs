@@ -40,7 +40,7 @@ namespace Movies.Services
 
         public async Task<bool> IsMaxReviews(Guid movieId)
         {
-            int movieYear = await uow.Movies.GetMovieYear(movieId, trackChanges: false);
+            int movieYear = await uow.Movies.GetMovieYearAsync(movieId, trackChanges: false);
             int movieAge = DateTime.Now.Year - movieYear;
 
             var reviewsInMovie = await uow.Reviews.GetTotalReviewsInMovieAsync(movieId);
@@ -68,7 +68,7 @@ namespace Movies.Services
         }
 
 
-        public async Task<bool> UpdateAsync(Guid id, GenrePutUpdateDto updateDto)
+        public async Task<bool> UpdateAsync(Guid id, ReviewPutUpdateDto updateDto)
         {
             var review = await uow.Reviews.GetReviewAsync(id, trackChanges: true);
             if (review == null)

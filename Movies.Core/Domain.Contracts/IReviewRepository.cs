@@ -7,6 +7,6 @@ namespace Movies.Core.Domain.Contracts
     {
         Task<(IEnumerable<Review>, PaginationMetadata)> GetAllReviewsAsync(bool trackChanges, BaseRequestParams requestParams);
         Task<Review?> GetReviewAsync(Guid id, bool trackChanges);
-        Task<int> GetTotalReviewsInMovieAsync(Guid movieId, bool trackChanges = false)
+        Task<int> GetTotalReviewsInMovieAsync(Guid movieId, bool trackChanges = false);
     }
 }

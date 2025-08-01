@@ -29,14 +29,20 @@ namespace Movies.Data.Repositories
 
         public async Task<Genre?> GetGenreAsync(Guid id, bool trackChanges, bool includeMovies)
         {
-            return await FindAll(trackChanges).Include(m => m.Movies).FirstOrDefaultAsync(r => r.Id == id);
+            return includeMovies ?
+                 await FindAll(trackChanges)
+                       .Include(m => m.Movies)
+                       .FirstOrDefaultAsync(g => g.Id == id)
+                :
+                 await FindAll(trackChanges)
+                       .FirstOrDefaultAsync(g => g.Id == id);
         }
 
 
         public async Task<bool> ExistsByNameAsync(string name, Guid? excludeId = null)
         {
             var query = FindAll(trackChanges: false)
-                .Where(g => g.Name.ToLower() == name.ToLower());
+                        .Where(g => g.Name.ToLower() == name.ToLower());
 
             if (excludeId.HasValue)
             {

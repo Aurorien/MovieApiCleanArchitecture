@@ -5,10 +5,12 @@ namespace Movies.Data.Repositories
 {
     public abstract class BaseRepository<T> : IBaseRepository<T> where T : class
     {
+        protected ApplicationDbContext Context { get; }
         protected DbSet<T> DbSet { get; }
 
         public BaseRepository(ApplicationDbContext context)
         {
+            Context = context;
             DbSet = context.Set<T>();
         }
 

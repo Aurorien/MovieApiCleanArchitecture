@@ -52,6 +52,14 @@ namespace Movies.Data.Repositories
         }
 
 
+        public async Task<int> NumberOfActorsInMovieAsync(Guid movieId)
+        {
+            return await Context.Set<MovieActor>()
+                .Where(ma => ma.MovieId == movieId)
+                .CountAsync();
+        }
+
+
         public void AddActorToMovie(MovieActor movieActor)
         {
             _context.Set<MovieActor>().Add(movieActor);

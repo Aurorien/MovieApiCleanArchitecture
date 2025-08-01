@@ -47,12 +47,31 @@ namespace Movies.Data.Repositories
                 .FirstOrDefaultAsync(m => m.Id == id);
         }
 
-        public async Task<int> GetMovieYear(Guid id, bool trackChanges = false)
+
+        public async Task<int> GetMovieYearAsync(Guid id, bool trackChanges = false)
         {
             return await FindAll(trackChanges)
                 .Where(m => m.Id == id)
                 .Select(m => m.Year)
                 .FirstOrDefaultAsync();
+        }
+
+
+        public async Task<int> GetMovieBudgetAsync(Guid movieId, bool trackChanges = false)
+        {
+            return (int)await Context.Set<MovieDetails>()
+                .Where(md => md.MovieId == movieId)
+                .Select(md => md.Budget)
+                .FirstOrDefaultAsync();
+        }
+
+
+        public async Task<bool> IsMovieOfGenreAsync(Guid movieId, string genreName)
+        {
+            return await FindAll(trackChanges: false)
+                .Where(m => m.Id == movieId)
+                .Where(m => EF.Functions.Like(m.Genre.Name.ToLower(), genreName.ToLower()))
+                .AnyAsync();
         }
     }
 }

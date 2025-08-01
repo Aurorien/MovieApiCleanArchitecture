@@ -13,7 +13,7 @@ namespace Movies.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20250801151543_nullable-budget")]
-    partial class nullablebudget
+    partial class Nullablebudget
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
