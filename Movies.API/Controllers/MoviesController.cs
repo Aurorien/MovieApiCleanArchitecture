@@ -41,7 +41,7 @@ namespace Movies.API.Controllers
         public async Task<ActionResult<MovieDto>> GetMovie([FromRoute] Guid id)
         {
             if (id == Guid.Empty)
-                return BadRequest(new { message = "Invalid movie ID" });
+                return BadRequest(new { message = "Invalid empty movie ID" });
 
             var movieDto = await serviceManager.MovieService.GetAsync(id);
 
@@ -62,7 +62,7 @@ namespace Movies.API.Controllers
         public async Task<ActionResult<MovieDetailedDto>> GetMovieDetailed([FromRoute] Guid id)
         {
             if (id == Guid.Empty)
-                return BadRequest(new { message = "Invalid movie ID" });
+                return BadRequest(new { message = "Invalid empty movie ID" });
 
             var movieDetailedDto = await serviceManager.MovieService.GetDetailedAsync(id);
             if (movieDetailedDto == null)
@@ -108,7 +108,7 @@ namespace Movies.API.Controllers
         public async Task<IActionResult> PutMovie([FromRoute] Guid id, [FromBody] MoviePutUpdateDto updateDto)
         {
             if (id == Guid.Empty)
-                return BadRequest(new { message = "Invalid movie ID" });
+                return BadRequest(new { message = "Invalid empty movie ID" });
 
             try
             {
@@ -146,7 +146,7 @@ namespace Movies.API.Controllers
         public async Task<IActionResult> DeleteMovie([FromRoute] Guid id)
         {
             if (id == Guid.Empty)
-                return BadRequest(new { message = "Invalid movie ID" });
+                return BadRequest(new { message = "Invalid empty movie ID" });
 
             try
             {

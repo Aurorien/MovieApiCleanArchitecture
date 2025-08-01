@@ -41,7 +41,7 @@ namespace Movies.API.Controllers
         public async Task<ActionResult<ReviewDto>> GetReview([FromRoute] Guid id)
         {
             if (id == Guid.Empty)
-                return BadRequest(new { message = "Invalid review ID" });
+                return BadRequest(new { message = "Invalid empty review ID" });
 
             var reviewDto = await serviceManager.ReviewService.GetAsync(id);
 
@@ -82,7 +82,7 @@ namespace Movies.API.Controllers
         public async Task<IActionResult> PutReview([FromRoute] Guid id, [FromBody] GenrePutUpdateDto updateDto)
         {
             if (id == Guid.Empty)
-                return BadRequest(new { message = "Invalid review ID" });
+                return BadRequest(new { message = "Invalid empty review ID" });
 
             try
             {
@@ -111,7 +111,7 @@ namespace Movies.API.Controllers
         public async Task<IActionResult> DeleteReview([FromRoute] Guid id)
         {
             if (id == Guid.Empty)
-                return BadRequest(new { message = "Invalid review ID" });
+                return BadRequest(new { message = "Invalid empty review ID" });
 
             try
             {

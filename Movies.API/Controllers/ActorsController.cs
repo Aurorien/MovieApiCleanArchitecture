@@ -77,7 +77,7 @@ namespace Movies.API.Controllers
         public async Task<IActionResult> PostActorToMovie([FromRoute] Guid movieId, [FromBody] MovieActorCreateDto maCreateDto)
         {
             if (movieId == Guid.Empty)
-                return BadRequest(new { message = "Invalid movie ID" });
+                return BadRequest(new { message = "Invalid empty movie ID" });
 
             try
             {
@@ -118,7 +118,7 @@ namespace Movies.API.Controllers
         public async Task<IActionResult> PutActor([FromRoute] Guid id, [FromBody] ActorPutUpdateDto updateDto)
         {
             if (id == Guid.Empty)
-                return BadRequest(new { message = "Invalid actor ID" });
+                return BadRequest(new { message = "Invalid empty actor ID" });
 
             try
             {
@@ -146,7 +146,7 @@ namespace Movies.API.Controllers
         public async Task<IActionResult> DeleteActor([FromRoute] Guid id)
         {
             if (id == Guid.Empty)
-                return BadRequest(new { message = "Invalid actor ID" });
+                return BadRequest(new { message = "Invalid empty actor ID" });
 
             try
             {

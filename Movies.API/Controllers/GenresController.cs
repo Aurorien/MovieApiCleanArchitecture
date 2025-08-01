@@ -42,7 +42,7 @@ namespace Movies.API.Controllers
         public async Task<ActionResult<GenreDto>> GetGenre([FromRoute] Guid id, [FromQuery] bool includeMovies = false)
         {
             if (id == Guid.Empty)
-                return BadRequest(new { message = "Invalid genre ID" });
+                return BadRequest(new { message = "Invalid empty genre ID" });
 
             var genreDto = await serviceManager.GenreService.GetAsync(id, includeMovies);
 
@@ -85,7 +85,7 @@ namespace Movies.API.Controllers
         public async Task<IActionResult> PutGenre([FromRoute] Guid id, [FromBody] GenrePutUpdateDto updateDto)
         {
             if (id == Guid.Empty)
-                return BadRequest(new { message = "Invalid genre ID" });
+                return BadRequest(new { message = "Invalid empty genre ID" });
 
             try
             {
@@ -118,7 +118,7 @@ namespace Movies.API.Controllers
         public async Task<IActionResult> DeleteGenre([FromRoute] Guid id)
         {
             if (id == Guid.Empty)
-                return BadRequest(new { message = "Invalid genre ID" });
+                return BadRequest(new { message = "Invalid empty genre ID" });
 
             try
             {
