@@ -71,12 +71,13 @@ namespace Movies.API.Controllers
             return Ok(movieDetailedDto);
         }
 
+        //ToDo: 422 for validation error in controllers across api
 
         // POST: api/movies
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(MovieDto))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ProblemDetails))]
         public async Task<ActionResult<MovieDto>> PostMovie([FromBody] MovieCreateDto createDto)
         {
             try
@@ -88,7 +89,7 @@ namespace Movies.API.Controllers
             {
                 return Problem(
                     detail: ex.Message,
-                    statusCode: StatusCodes.Status400BadRequest,
+                    statusCode: StatusCodes.Status422UnprocessableEntity,
                     title: "Invalid GenreId. Does not exist in database.",
                     type: "https://tools.ietf.org/html/rfc7231#section-6.5.1"
                 );
