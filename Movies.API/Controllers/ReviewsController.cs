@@ -79,10 +79,14 @@ namespace Movies.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> PutReview([FromRoute] Guid id, [FromBody] GenrePutUpdateDto updateDto)
+        public async Task<IActionResult> PutReview([FromRoute] Guid id, [FromBody] ReviewPutUpdateDto updateDto)
         {
             if (id == Guid.Empty)
                 return BadRequest(new { message = "Invalid empty review ID" });
+
+            var isMaxReviews = await serviceManager.ReviewService.IsMaxReviews(updateDto.MovieId);
+            if (isMaxReviews)
+                return BadRequest(new { message = "Not possible to add more reviews to movie. Max limit of reviews for movie was reached." });
 
             try
             {
