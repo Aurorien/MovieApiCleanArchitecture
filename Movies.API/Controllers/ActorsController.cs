@@ -128,7 +128,7 @@ namespace Movies.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> PutActor([FromRoute] Guid id, [FromBody] ActorPutUpdateDto updateDto)
+        public async Task<IActionResult> PutActor([FromRoute] Guid id, [FromBody] ActorUpdateDto updateDto)
         {
             if (id == Guid.Empty)
                 return BadRequest(new { message = "Invalid empty actor ID" });

@@ -2,7 +2,7 @@
 
 namespace Movies.Contracts
 {
-    public interface IGenreService : IBaseService<GenreDto, GenreCreateDto, GenrePutUpdateDto>
+    public interface IGenreService : IBaseService<GenreDto, GenreCreateDto, GenreUpdateDto>
     {
         Task<GenreDto?> GetAsync(Guid id, bool includeMovies);
     }

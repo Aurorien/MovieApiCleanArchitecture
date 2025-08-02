@@ -96,7 +96,7 @@ namespace Movies.Services
         }
 
 
-        public async Task<bool> UpdateAsync(Guid id, ActorPutUpdateDto updateDto)
+        public async Task<bool> UpdateAsync(Guid id, ActorUpdateDto updateDto)
         {
             var actor = await uow.Actors.GetActorAsync(id, trackChanges: true);
             if (actor == null)

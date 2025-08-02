@@ -2,7 +2,7 @@
 
 namespace Movies.Contracts
 {
-    public interface IActorService : IBaseService<ActorDto, ActorCreateDto, ActorPutUpdateDto>
+    public interface IActorService : IBaseService<ActorDto, ActorCreateDto, ActorUpdateDto>
     {
         Task<ActorDto?> GetAsync(Guid id);
         Task<bool> IsActorInMovieAsync(Guid movieId, Guid actorId);

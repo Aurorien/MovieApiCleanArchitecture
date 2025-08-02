@@ -6,11 +6,13 @@ using Movies.Core.Domain.Models.DTOs.ReviewDtos;
 using Movies.Core.Domain.Models.Entities;
 using Movies.Core.Requests;
 
+
+
 namespace Movies.Services
 {
     public class MovieService : IMovieService
     {
-        private IUnitOfWork uow;
+        private readonly IUnitOfWork uow;
 
         public MovieService(IUnitOfWork uow)
         {
@@ -79,7 +81,7 @@ namespace Movies.Services
         }
 
 
-        public async Task<bool> UpdateAsync(Guid id, MoviePutUpdateDto updateDto)
+        public async Task<bool> UpdateAsync(Guid id, MovieUpdateDto updateDto)
         {
             var genreExists = await uow.Genres.AnyAsync(updateDto.GenreId);
             if (!genreExists)
@@ -161,12 +163,9 @@ namespace Movies.Services
         {
             var genre = await uow.Genres.GetGenreAsync(genreId, trackChanges: false, includeMovies: false);
 
-            if (genre == null)
-            {
-                throw new ArgumentException($"Genre with ID {genreId} does not exist.");
-            }
-
-            return genre.Name.Trim().ToLower() == "documentary";
+            return genre == null
+                ? throw new ArgumentException($"Genre with ID {genreId} does not exist.")
+                : genre.Name.Trim().Equals("documentary", StringComparison.CurrentCultureIgnoreCase);
         }
 
 

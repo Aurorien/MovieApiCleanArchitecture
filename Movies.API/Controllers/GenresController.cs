@@ -82,7 +82,7 @@ namespace Movies.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> PutGenre([FromRoute] Guid id, [FromBody] GenrePutUpdateDto updateDto)
+        public async Task<IActionResult> PutGenre([FromRoute] Guid id, [FromBody] GenreUpdateDto updateDto)
         {
             if (id == Guid.Empty)
                 return BadRequest(new { message = "Invalid empty genre ID" });

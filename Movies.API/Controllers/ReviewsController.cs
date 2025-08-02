@@ -79,7 +79,7 @@ namespace Movies.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> PutReview([FromRoute] Guid id, [FromBody] ReviewPutUpdateDto updateDto)
+        public async Task<IActionResult> PutReview([FromRoute] Guid id, [FromBody] ReviewUpdateDto updateDto)
         {
             if (id == Guid.Empty)
                 return BadRequest(new { message = "Invalid empty review ID" });

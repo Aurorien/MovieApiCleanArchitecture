@@ -59,7 +59,7 @@ namespace Movies.Services
         }
 
 
-        public async Task<bool> UpdateAsync(Guid id, GenrePutUpdateDto updateDto)
+        public async Task<bool> UpdateAsync(Guid id, GenreUpdateDto updateDto)
         {
             var genre = await uow.Genres.GetGenreAsync(id, trackChanges: true, includeMovies: false);
             if (genre == null)

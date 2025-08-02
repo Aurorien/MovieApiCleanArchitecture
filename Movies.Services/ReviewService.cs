@@ -68,7 +68,7 @@ namespace Movies.Services
         }
 
 
-        public async Task<bool> UpdateAsync(Guid id, ReviewPutUpdateDto updateDto)
+        public async Task<bool> UpdateAsync(Guid id, ReviewUpdateDto updateDto)
         {
             var review = await uow.Reviews.GetReviewAsync(id, trackChanges: true);
             if (review == null)
