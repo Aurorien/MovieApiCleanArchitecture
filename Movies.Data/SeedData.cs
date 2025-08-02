@@ -8,7 +8,7 @@ namespace Movies.Data
 {
     public class SeedData
     {
-        private static Faker faker = new Faker();
+        private static readonly Faker faker = new Faker();
 
         private static readonly string[] _genres =
         {
@@ -17,7 +17,7 @@ namespace Movies.Data
             "Western", "Crime", "Documentary", "Animation", "Musical"
         };
 
-        private static int _maxAvailableGenres => _genres.Length;
+        private static int MaxAvailableGenres => _genres.Length;
 
 
         public static async Task InitAsync(ApplicationDbContext context)
@@ -60,7 +60,7 @@ namespace Movies.Data
             foreach (var movie in movies)
             {
                 // Randomly assigning 1-3 actors to each movie
-                var numberOfActors = faker.Random.Int(1, Math.Min(3, actors.Count()));
+                var numberOfActors = faker.Random.Int(1, Math.Min(3, actors.Count));
                 var selectedActors = faker.PickRandom(actors, numberOfActors);
 
                 foreach (var actor in selectedActors)
@@ -156,10 +156,10 @@ namespace Movies.Data
 
         private static List<Genre> GenerateUniqueGenres(int count)
         {
-            if (count > _maxAvailableGenres)
+            if (count > MaxAvailableGenres)
             {
-                Debug.WriteLine($"Requested {count} genres reduced to {_maxAvailableGenres}");
-                count = _maxAvailableGenres;
+                Debug.WriteLine($"Requested {count} genres reduced to {MaxAvailableGenres}");
+                count = MaxAvailableGenres;
             }
 
             var faker = new Faker();

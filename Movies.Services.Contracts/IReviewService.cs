@@ -1,6 +1,6 @@
 ﻿using Movies.Core.Domain.Models.DTOs.ReviewDtos;
 
-namespace Movies.Contracts
+namespace Movies.Services.Contracts
 {
     public interface IReviewService : IBaseService<ReviewDto, ReviewCreateDto, ReviewUpdateDto>
     {

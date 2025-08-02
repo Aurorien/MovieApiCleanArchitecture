@@ -2,11 +2,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Movies.API.Extensions;
-using Movies.Contracts;
 using Movies.Core.Domain.Contracts;
 using Movies.Data;
 using Movies.Data.Repositories;
 using Movies.Services;
+using Movies.Services.Contracts;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

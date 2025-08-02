@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Movies.Contracts;
 using Movies.Core.Domain.Models.DTOs.ActorDtos;
 using Movies.Core.Domain.Models.Entities;
 using Movies.Core.Requests;
+using Movies.Services.Contracts;
 using System.Text.Json;
 
 namespace Movies.Presentation.Controllers

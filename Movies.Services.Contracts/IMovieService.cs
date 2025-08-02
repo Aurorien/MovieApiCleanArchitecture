@@ -1,6 +1,6 @@
 ﻿using Movies.Core.Domain.Models.DTOs.MovieDtos;
 
-namespace Movies.Contracts
+namespace Movies.Services.Contracts
 {
     public interface IMovieService : IBaseService<MovieDto, MovieCreateDto, MovieUpdateDto>
     {

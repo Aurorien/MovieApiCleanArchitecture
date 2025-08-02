@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Movies.Contracts;
+using Movies.Services.Contracts;
 using Movies.Core.Domain.Models.DTOs.MovieDtos;
 using Movies.Core.Requests;
 using System.Text.Json;

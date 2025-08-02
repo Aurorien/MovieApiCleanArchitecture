@@ -1,6 +1,6 @@
 ﻿using Movies.Core.Domain.Models.DTOs.ActorDtos;
 
-namespace Movies.Contracts
+namespace Movies.Services.Contracts
 {
     public interface IActorService : IBaseService<ActorDto, ActorCreateDto, ActorUpdateDto>
     {

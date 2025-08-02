@@ -1,6 +1,6 @@
 ﻿using Movies.Core.Requests;
 
-namespace Movies.Contracts
+namespace Movies.Services.Contracts
 {
     public interface IBaseService<TDto, TCreateDto, TUpdateDto>
     {

@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Movies.Contracts;
 using Movies.Core.Domain.Contracts;
 using Movies.Core.Domain.Models.DTOs.MovieDtos;
 using Movies.Core.Domain.Models.DTOs.ReviewDtos;
 using Movies.Core.Domain.Models.Entities;
 using Movies.Core.Requests;
+using Movies.Services.Contracts;
 
 
 

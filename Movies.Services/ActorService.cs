@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Movies.Contracts;
+using Movies.Services.Contracts;
 using Movies.Core.Domain.Contracts;
 using Movies.Core.Domain.Models.DTOs.ActorDtos;
 using Movies.Core.Domain.Models.DTOs.MovieDtos;
