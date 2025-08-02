@@ -11,11 +11,12 @@ namespace Movies.Data
         private static Faker faker = new Faker();
 
         private static readonly string[] _genres =
-{
-        "Action", "Adventure", "Comedy", "Drama", "Fantasy",
-        "Horror", "Mystery", "Romance", "Sci-Fi", "Thriller",
-        "Western", "Crime", "Documentary", "Animation", "Musical"
-    };
+        {
+            "Action", "Adventure", "Comedy", "Drama", "Fantasy",
+            "Horror", "Mystery", "Romance", "Sci-Fi", "Thriller",
+            "Western", "Crime", "Documentary", "Animation", "Musical"
+        };
+
         private static int _maxAvailableGenres => _genres.Length;
 
 
@@ -153,6 +154,21 @@ namespace Movies.Data
         }
 
 
+        private static List<Genre> GenerateUniqueGenres(int count)
+        {
+            if (count > _maxAvailableGenres)
+            {
+                Debug.WriteLine($"Requested {count} genres reduced to {_maxAvailableGenres}");
+                count = _maxAvailableGenres;
+            }
+
+            var faker = new Faker();
+            return faker.PickRandom(_genres, count)
+                       .Select(name => new Genre { Name = name })
+            .ToList();
+        }
+
+
         private static List<Review> GenerateReviews(List<Movie> movies, int totalReviews)
         {
             var reviews = new List<Review>();
@@ -193,20 +209,6 @@ namespace Movies.Data
             };
 
             return faker.PickRandom(cultures);
-        }
-
-        private static List<Genre> GenerateUniqueGenres(int count)
-        {
-            if (count > _maxAvailableGenres)
-            {
-                Debug.WriteLine($"Requested {count} genres reduced to {_maxAvailableGenres}");
-                count = _maxAvailableGenres;
-            }
-
-            var faker = new Faker();
-            return faker.PickRandom(_genres, count)
-                       .Select(name => new Genre { Name = name })
-            .ToList();
         }
     }
 }
