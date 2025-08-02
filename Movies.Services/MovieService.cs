@@ -193,7 +193,7 @@ namespace Movies.Services
                 throw new ArgumentException($"Genre with ID {genreId} is not documentary.");
             }
 
-            return newBudget >= 1000000;
+            return newBudget > 1000000;
         }
 
 
