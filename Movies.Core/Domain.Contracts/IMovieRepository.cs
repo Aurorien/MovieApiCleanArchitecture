@@ -9,7 +9,6 @@ namespace Movies.Core.Domain.Contracts
         Task<Movie?> GetMovieAsync(Guid id, bool trackChanges);
         Task<Movie?> GetMovieDetailedAsync(Guid id, bool trackChanges = false);
         Task<int> GetMovieYearAsync(Guid id, bool trackChanges = false);
-        Task<int> GetMovieBudgetAsync(Guid movieId, bool trackChanges = false);
         Task<bool> IsMovieOfGenreAsync(Guid movieId, string genreName);
     }
 }

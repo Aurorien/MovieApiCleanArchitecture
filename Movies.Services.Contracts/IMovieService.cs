@@ -9,7 +9,7 @@ namespace Movies.Contracts
         Task<bool> IsMovieDocumentaryAsync(Guid movieId);
         Task<bool> IsGenreIdDocumentaryAsync(Guid genreId);
         Task<bool> IsDocumentaryActorLimitReachedAsync(Guid movieId);
-        Task<bool> IsDocumentaryBudgetLimitReachedAsync(Guid genreId);
+        Task<bool> IsDocumentaryBudgetLimitReachedAsync(Guid genreId, int? newBudget);
         Task<MovieUpdateDto> GetUpdateDtoAsync(Guid id);
     }
 }

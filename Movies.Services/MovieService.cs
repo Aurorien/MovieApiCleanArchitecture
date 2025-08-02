@@ -54,7 +54,7 @@ namespace Movies.Services
                 throw new ArgumentException("Invalid GenreId. Genre does not exist in db.");
 
             var isDocumentary = await IsGenreIdDocumentaryAsync(createDto.GenreId);
-            if (isDocumentary && await IsDocumentaryBudgetLimitReachedAsync(createDto.GenreId))
+            if (isDocumentary && await IsDocumentaryBudgetLimitReachedAsync(createDto.GenreId, createDto.Budget))
             {
                 throw new ArgumentException("Invalid budget. Genre documentary has a limit of 1,000,000 in budget.");
             }
@@ -88,7 +88,7 @@ namespace Movies.Services
                 throw new ArgumentException("Invalid GenreId. Genre does not exist in db.");
 
             var isDocumentary = await IsGenreIdDocumentaryAsync(updateDto.GenreId);
-            if (isDocumentary && await IsDocumentaryBudgetLimitReachedAsync(updateDto.GenreId))
+            if (isDocumentary && await IsDocumentaryBudgetLimitReachedAsync(updateDto.GenreId, updateDto.Budget))
             {
                 throw new ArgumentException("Invalid budget. Genre documentary has a limit of 1,000,000 in budget.");
             }
@@ -183,17 +183,17 @@ namespace Movies.Services
         }
 
 
-        public async Task<bool> IsDocumentaryBudgetLimitReachedAsync(Guid genreId)
+        public async Task<bool> IsDocumentaryBudgetLimitReachedAsync(Guid genreId, int? newBudget)
         {
+            if (newBudget == null) return false;
+
             bool isDocumentary = await IsGenreIdDocumentaryAsync(genreId);
             if (!isDocumentary)
             {
                 throw new ArgumentException($"Genre with ID {genreId} is not documentary.");
             }
 
-            var movieBudget = await uow.Movies.GetMovieBudgetAsync(genreId, trackChanges: false);
-
-            return movieBudget <= 1000000;
+            return newBudget <= 1000000;
         }
 
 
