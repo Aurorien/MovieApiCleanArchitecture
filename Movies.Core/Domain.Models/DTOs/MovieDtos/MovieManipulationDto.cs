@@ -14,7 +14,6 @@ namespace Movies.Core.Domain.Models.DTOs.MovieDtos
         public int Year { get; set; }
 
         [Required(ErrorMessage = "Movie GenreId is a required field")]
-        [StringLength(50)]
         public Guid GenreId { get; set; }
 
         [Required(ErrorMessage = "Movie DurationInMinutes is a required field")]

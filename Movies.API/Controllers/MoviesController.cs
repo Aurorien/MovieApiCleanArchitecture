@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Movies.Contracts;
 using Movies.Core.Domain.Models.DTOs.MovieDtos;
@@ -105,7 +106,7 @@ namespace Movies.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> PutMovie([FromRoute] Guid id, [FromBody] MoviePutUpdateDto updateDto)
+        public async Task<IActionResult> PutMovie([FromRoute] Guid id, [FromBody] MovieUpdateDto updateDto)
         {
             if (id == Guid.Empty)
                 return BadRequest(new { message = "Invalid empty movie ID" });
@@ -132,6 +133,56 @@ namespace Movies.API.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     new { message = "An error occurred while updating the movie" });
+            }
+        }
+
+        [HttpPatch("{id:guid}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> PatchMovie([FromRoute] Guid id, [FromBody] JsonPatchDocument<MovieUpdateDto> patchDocument)
+        {
+            if (id == Guid.Empty)
+                return BadRequest(new { message = "Invalid empty movie ID" });
+
+            if (patchDocument == null)
+                return BadRequest(new { message = "Patch document cannot be null" });
+
+            try
+            {
+                var updateDto = await serviceManager.MovieService.GetUpdateDtoAsync(id);
+                patchDocument.ApplyTo(updateDto, ModelState);
+
+                if (!ModelState.IsValid || !TryValidateModel(updateDto))
+                    return BadRequest(ModelState);
+
+                var success = await serviceManager.MovieService.UpdateAsync(id, updateDto);
+
+                return success ? NoContent() : NotFound();
+            }
+            catch (ArgumentException ex)
+            {
+                return Problem(
+                    detail: ex.Message,
+                    statusCode: StatusCodes.Status400BadRequest,
+                    title: "Invalid Id. Does not exist in database.",
+                    type: "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+                );
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return Conflict(new { message = "The record was modified by another process" });
+            }
+            catch (Exception ex)
+            {
+                return Problem(
+                    detail: ex.Message,
+                    statusCode: StatusCodes.Status500InternalServerError,
+                    title: "An error occurred while updating the movie.",
+                    type: "https://tools.ietf.org/html/rfc7231#section-6.6.1"
+                );
             }
         }
 

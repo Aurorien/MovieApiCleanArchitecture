@@ -198,6 +198,24 @@ namespace Movies.Services
         }
 
 
+        public async Task<MovieUpdateDto> GetUpdateDtoAsync(Guid id)
+        {
+            var movie = await uow.Movies.GetMovieAsync(id, trackChanges: true) ?? throw new ArgumentException("Invalid movie Id. Movie does not exist in db.");
+
+            var movieDtoToPatch = new MovieUpdateDto
+            {
+                Title = movie.Title,
+                Year = movie.Year,
+                GenreId = movie.GenreId,
+                DurationInMinutes = movie.DurationInMinutes,
+                Synopsis = movie.MovieDetails.Synopsis,
+                Language = movie.MovieDetails.Language,
+                Budget = movie.MovieDetails.Budget
+            };
+
+            return movieDtoToPatch;
+        }
+
 
         private MovieDto MapToDto(Movie movie)
         {
@@ -208,6 +226,9 @@ namespace Movies.Services
                 Year = movie.Year,
                 Genre = movie.Genre.Name,
                 DurationInMinutes = movie.DurationInMinutes,
+                Synopsis = movie.MovieDetails.Synopsis,
+                Language = movie.MovieDetails.Language,
+                Budget = movie.MovieDetails.Budget
             };
         }
 
