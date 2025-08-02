@@ -12,25 +12,27 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationDbContext") ?? throw new InvalidOperationException("Connection string 'ApplicationDbContext' not found.")));
 
-builder.Services.AddControllers().ConfigureApiBehaviorOptions(setupAction =>
-{
-    setupAction.InvalidModelStateResponseFactory = context =>
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(setupAction =>
     {
-        var problemDetailsFactory = context.HttpContext.RequestServices.GetRequiredService<ProblemDetailsFactory>();
-        var validationProblemDetails = problemDetailsFactory.CreateValidationProblemDetails(context.HttpContext,
-                                                                                             context.ModelState);
-
-        validationProblemDetails.Detail = "Se error field for details.";
-        validationProblemDetails.Instance = context.HttpContext.Request.Path;
-        validationProblemDetails.Status = StatusCodes.Status422UnprocessableEntity;
-        validationProblemDetails.Title = "One or more validation errors occured.";
-
-        return new UnprocessableEntityObjectResult(validationProblemDetails)
+        setupAction.InvalidModelStateResponseFactory = context =>
         {
-            ContentTypes = { "application/problem+json" }
+            var problemDetailsFactory = context.HttpContext.RequestServices.GetRequiredService<ProblemDetailsFactory>();
+            var validationProblemDetails = problemDetailsFactory.CreateValidationProblemDetails(context.HttpContext,
+                                                                                                 context.ModelState);
+
+            validationProblemDetails.Detail = "Se error field for details.";
+            validationProblemDetails.Instance = context.HttpContext.Request.Path;
+            validationProblemDetails.Status = StatusCodes.Status422UnprocessableEntity;
+            validationProblemDetails.Title = "One or more validation errors occured.";
+
+            return new UnprocessableEntityObjectResult(validationProblemDetails)
+            {
+                ContentTypes = { "application/problem+json" }
+            };
         };
-    };
-});
+    })
+    .AddNewtonsoftJson();
 
 builder.Services.AddOpenApi();
 
