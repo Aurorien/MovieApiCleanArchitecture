@@ -1,0 +1,8 @@
+o Hur skiljer sig detta från tidigare övningar? 
+Svar: I tidigare övningar har vi jobbat med innehåll i färre projekt. Allt har oftast känt till allt. I det här lösningen har vi jobbat med abstraktioner och "separation of concerns" och delat upp lösningen i lager som bara känner till de saker som är relevant för dess uppgift.
+ 
+o Vad är fördelarna med flerlagerarkitektur? 
+Svar: Genom registreringen av tjänster i DI(Dependency Injection)-containern kan en klass i ett projekt som vill använda en instans bara behöva känna till interfacet. På så vis frikopplas projekten. Det gör också lösningen lättare att underhålla och att skala. För högre säkerhet har varje lager bara de referenser lagret verkligen behöver. API-lagret kan inte "råka" komma åt databasen direkt vilket är en viktig säkerhetsaspekt. Andra fördelar är att man kan ändra implementation av något projekt utan att behöva ändra i andra projekt som använder det. Det är också en stor fördel för test. Testen blir isolerade och konflikter mellan test undviks, mycket lättare att mocka, testen går snabbare eftersom man inte behöver sätta upp en databas för varje test och ingen databashantering behövs. 
+
+o Hur kan du använda detta i ett riktigt projekt? 
+Svar: Den här arkitekturen gör att det blir enkelt att byta teknologier (som databas eller betallösningar) eller miljöer (testmiljö vs produktion) genom att bara ändra DI-registreringen utan att röra annan kod. Det ökar också lösningens framtidssäkerhet då nya krav enklare kan hanteras med nya implementationer. Det möjliggör också att olika team kan jobba parallellt på olika lager och att CI/CD-processen blir smidig med snabba tester som samtidigt är pålitliga.
