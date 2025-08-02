@@ -11,9 +11,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Movies.Data", "Movies.Data\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Movies.Services", "Movies.Services\Movies.Services.csproj", "{42D29E67-3154-40AA-9E7F-C5357218B014}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Movies.Contracts", "Movies.Contracts\Movies.Contracts.csproj", "{37E409E1-9730-4E1E-A28A-95EB91F0B95A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Movies.Services.Contracts", "Movies.Services.Contracts\Movies.Services.Contracts.csproj", "{37E409E1-9730-4E1E-A28A-95EB91F0B95A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Movies.Presentation", "Movies.Presentation\Movies.Presentation.csproj", "{037071A4-7546-4A69-9EB3-2D6EFC622C6F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Movies.Services.Tests", "Movies.Services.Tests\Movies.Services.Tests.csproj", "{16328799-E493-4746-AABE-7E89FB9BCB82}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{037071A4-7546-4A69-9EB3-2D6EFC622C6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{037071A4-7546-4A69-9EB3-2D6EFC622C6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{037071A4-7546-4A69-9EB3-2D6EFC622C6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16328799-E493-4746-AABE-7E89FB9BCB82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16328799-E493-4746-AABE-7E89FB9BCB82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16328799-E493-4746-AABE-7E89FB9BCB82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16328799-E493-4746-AABE-7E89FB9BCB82}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
