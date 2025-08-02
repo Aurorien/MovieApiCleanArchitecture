@@ -6,7 +6,7 @@ using Movies.Core.Domain.Models.DTOs.GenreDtos;
 using Movies.Core.Requests;
 using System.Text.Json;
 
-namespace Movies.API.Controllers
+namespace Movies.Presentation.Controllers
 {
 
     [Route("api/genres")]

@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Movies.Data\Movies.Data.csproj" />
+    <ProjectReference Include="..\Movies.Presentation\Movies.Presentation.csproj" />
     <ProjectReference Include="..\Movies.Services\Movies.Services.csproj" />
   </ItemGroup>
 

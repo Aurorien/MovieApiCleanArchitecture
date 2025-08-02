@@ -7,7 +7,7 @@ using Movies.Core.Domain.Models.Entities;
 using Movies.Core.Requests;
 using System.Text.Json;
 
-namespace Movies.API.Controllers
+namespace Movies.Presentation.Controllers
 {
     [ApiController]
     public class ActorsController : ControllerBase
