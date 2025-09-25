@@ -4,7 +4,7 @@ namespace Movies.Core.Domain.Models.DTOs.GenreDtos
 {
     public class GenreDto
     {
-        [JsonPropertyOrder(1)]
+        [JsonPropertyOrder(1)] // attribute JsonPropertyOrder is used to decide the order of fields in the json object
         public Guid Id { get; set; }
 
         [JsonPropertyOrder(2)]
